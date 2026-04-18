@@ -353,6 +353,7 @@ while True:
             "Depakine Chrono 500mg/tab": ("Valproate", 500),
             "Depakine Chrono 200mg/tab": ("Valproate", 200),
             "Risperdal 1 mg/tab": ("Risperidone", 1),
+            "Tegretol 200mg/tab":("Carbamazepine", 200),
 
         }
 
@@ -642,7 +643,7 @@ while True:
                                 label = f"{value:.0f}"
                             ax.add_patch(circ)
                             ax.text(cx, cy, label, ha='center', va='center',
-                                    fontsize=5, color="black")
+                                    fontsize=8, color="black")
                         else:
                             continue
 

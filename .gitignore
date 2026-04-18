@@ -13,7 +13,10 @@
 *.log
 DRE*
 NDRE*
-/Plots_and_CSVs
+Plots_and_CSVs/
 *.db
 *.png
 *.jpg
+old_code/
+.venv/
+__pycache__/
