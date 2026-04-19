@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QTableView" name="parsed_table">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>50</y>
+      <width>511</width>
+      <height>411</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btn_source">
+    <property name="geometry">
+     <rect>
+      <x>600</x>
+      <y>170</y>
+      <width>151</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Select Source File (Docx)</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btn_output">
+    <property name="geometry">
+     <rect>
+      <x>600</x>
+      <y>260</y>
+      <width>151</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Output to csv</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="data_select">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>30</y>
+      <width>69</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>Static Data</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>ASMs</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Seizure</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>EEG Results</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Blood Tests</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Cognitive Tests</string>
+     </property>
+    </item>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
