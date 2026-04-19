@@ -17,6 +17,7 @@ Plots_and_CSVs/
 *.db
 *.png
 *.jpg
+*.csv
 old_code/
 .venv/
 __pycache__/
