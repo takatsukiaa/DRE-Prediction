@@ -1,6 +1,16 @@
 import pandas as pd
 from docx import Document
 
+DRUG_FREQUENCY_MAP={
+    "QD": 1,
+    "BID": 2,
+    "BIDPC":2,
+    "TID": 3,
+    "HS": 1,
+    "as order": 1,
+    "QN": 1,
+}
+
 def get_cell_text(cell):
     """
     Robustly extracts text from a docx cell, matching the logic 
@@ -50,6 +60,16 @@ def extract_asm_timeline(target_table):
         data.append(row_data)
 
     df = pd.DataFrame(data, columns=headers)
+
+
+
+    # fill in empty months!
+    df['Date'] = pd.to_datetime(df['Date']) 
+    df = df.set_index('Date')
+    df = df.resample('ME').ffill()
+    df.drop("備註", axis=1, inplace=True)
+
+
     return df
 
 
