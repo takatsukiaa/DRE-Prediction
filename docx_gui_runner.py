@@ -6,8 +6,6 @@ import docx_parser_static
 
 from ui_data_model import DocxTableModel
 
-QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
-QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
 
 # The DocxApp class handles the business logic and signal-slot connections.
 

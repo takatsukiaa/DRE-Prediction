@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'docx_guiIuITrd.ui'
+## Form generated from reading UI file 'docx_guiYViBdz.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.5.0
 ##
@@ -19,23 +19,22 @@ from PySide6.QtWidgets import (QApplication, QComboBox, QHeaderView, QMainWindow
     QMenuBar, QPushButton, QSizePolicy, QStatusBar,
     QTableView, QWidget)
 
-
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(800, 600)
+        MainWindow.resize(1440, 960)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.parsed_table = QTableView(self.centralwidget)
         self.parsed_table.setObjectName(u"parsed_table")
-        self.parsed_table.setGeometry(QRect(20, 50, 511, 411))
+        self.parsed_table.setGeometry(QRect(20, 50, 1041, 791))
         self.btn_source = QPushButton(self.centralwidget)
         self.btn_source.setObjectName(u"btn_source")
-        self.btn_source.setGeometry(QRect(600, 170, 151, 41))
+        self.btn_source.setGeometry(QRect(1160, 260, 151, 41))
         self.btn_output = QPushButton(self.centralwidget)
         self.btn_output.setObjectName(u"btn_output")
-        self.btn_output.setGeometry(QRect(600, 260, 151, 41))
+        self.btn_output.setGeometry(QRect(1160, 360, 151, 41))
         self.data_select = QComboBox(self.centralwidget)
         self.data_select.addItem("")
         self.data_select.addItem("")
@@ -44,11 +43,14 @@ class Ui_MainWindow(object):
         self.data_select.addItem("")
         self.data_select.addItem("")
         self.data_select.setObjectName(u"data_select")
-        self.data_select.setGeometry(QRect(20, 30, 69, 22))
+        self.data_select.setGeometry(QRect(20, 30, 161, 22))
+        self.interval_select = QComboBox(self.centralwidget)
+        self.interval_select.setObjectName(u"interval_select")
+        self.interval_select.setGeometry(QRect(900, 30, 161, 22))
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 800, 22))
+        self.menubar.setGeometry(QRect(0, 0, 1440, 22))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")

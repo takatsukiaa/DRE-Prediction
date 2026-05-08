@@ -154,3 +154,4 @@ def save_to_csv(output_file):
 def print_parsed_data():
     for key, value in parsed_data.items():
         print(f"{key}: {value}")
+    print("\n")
