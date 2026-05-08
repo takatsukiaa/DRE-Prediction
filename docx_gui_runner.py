@@ -3,6 +3,8 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog
 from PySide6.QtCore import Qt, Slot
 import ui_docx_gui
 import docx_parser_static
+import docx_parser_asm
+import pandas as pd
 
 from ui_data_model import DocxTableModel
 
@@ -15,7 +17,8 @@ class DocxApp(QMainWindow):
         # Initialize the generated UI
         self.ui = ui_docx_gui.Ui_MainWindow()
         self.ui.setupUi(self)
-        self.parsed_data = {}
+        self.parsed_static = {}
+        self.parsed_asm = pd.DataFrame()  # Initialize as empty DataFrame for consistency
         # Connect signals to slots (event handling)
         self.init_signals()
 
@@ -38,7 +41,7 @@ class DocxApp(QMainWindow):
         if file_path:
             # 1. Fetch raw data from parser
             raw_data = docx_parser_static.initial_table_selection(file_path)
-            self.parsed_data = raw_data
+            self.parsed_static = raw_data
 
             # 2. Dynamic Header Extraction
             headers = []
@@ -65,9 +68,9 @@ class DocxApp(QMainWindow):
         print("Exporting to CSV...")
         # Add your CSV conversion logic here
         
-        if self.parsed_data:
+        if self.parsed_static:
             docx_parser_static.save_to_csv("output.csv")
-            print(f"Data exported: {self.parsed_data}")
+            print(f"Data exported: {self.parsed_static}")
         else:
             print("No data to export.")
 
