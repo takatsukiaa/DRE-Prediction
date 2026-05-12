@@ -1,6 +1,8 @@
 import pandas as pd
 from docx import Document
 import re
+from tkinter.filedialog import askopenfilename
+from tkinter import Tk
 
 DRUG_FREQUENCY_MAP={
     "QD": 1,
@@ -184,8 +186,13 @@ def table_selection(filepath):
 
 if __name__ == "__main__":
     # Test the function with the provided file
-    filepath = r"C:\Users\89665\Desktop\Epilepsy\DRE_Prediction\DRE\0003DRE.docx"
-    df = table_selection(filepath)
+    root = Tk()
+    root.withdraw()
+    file_path = askopenfilename(
+        title="Select Patient Docx File (Cancel to Exit)",
+        filetypes=[("Docx files", "*.Docx"), ("All files", "*.*")]
+    )
+    df = table_selection(file_path)
     df.to_csv("test.csv")
     if df is not None:
         print("DataFrame Shape:", df.shape)
