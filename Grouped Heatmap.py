@@ -30,7 +30,7 @@ EEG_GROUPS = {
 SEIZURE_TYPES = {
     "1.1": "FPC", "1.2": "FIC", "1.3": "FBTC",
     "2.1": "PC", "2.2": "IC", "2.3": "BTC",
-    "3.1": "AS", "3.2": "GTC", "3.3": "Other G",
+    "3.1": "AS", "3.2": "GTC", "3.3": "Other Generalized",
     "4": "Unclassified"
 }
 

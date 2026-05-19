@@ -16,6 +16,7 @@ parsed_data = {
     "Etiology": "",
     "Focal": "",
     "EEG Focality": "",
+    "Mental Retardation": "",
     # other fields
 }
 def baseline_parsing(table):
@@ -77,6 +78,8 @@ def etiology_parsing(table):
     cell = row.cells[1]
     clean_text = cell.text.strip().replace('\n', ' ')
     parsed_data["Etiology"] = clean_text
+    temp = row.cells[3].text.strip().replace('\n', ' ')
+    parsed_data["Mental Retardation"] = temp
 
 def eeg_parsing(table):
     flat_cells = []
@@ -144,6 +147,7 @@ def initial_table_selection(file_path):
 def save_to_csv(output_file):
     # Since the source is a Key-Value pair table,
     # we can pair them into a dictionary for a standard CSV format
+    
     with open(output_file, 'w', newline='', encoding='utf-8-sig') as f:
         writer = csv.writer(f)
         writer.writerow(["# Metadata"])

@@ -1,15 +1,28 @@
+import os
+
 import pandas as pd
 from docx import Document
 import re
 from tkinter.filedialog import askopenfilename
 from tkinter import Tk
+import numpy as np
 
 DRUG_FREQUENCY_MAP={
     "QD": 1,
+    "QDPC": 1,
+    "QNPC":1,
+    "QOD": 0.5,
+    "QOHS": 0.5,
+    "QO HS": 0.5,
+    "QDLUNCH": 1,
     "PRN": 1,
+    "HS PRN": 1,
     "BID": 2,
+    "BID PRN": 2,
     "BIDPC":2,
+    "BIDPC (7 days)":2,
     "TID": 3,
+    "TIDPC": 3,
     "HS": 1,
     "as order": 1,
     "QN": 1,
@@ -31,39 +44,64 @@ DDD_MG = {
         "Phenytoin": 300,
         "Phenobarbital": 100,
         "Risperidone": 5,
+        "Gabapentin" : 1800,
 }
 
 # MAP CSV ROW → (drug_name, mg_per_unit)
 ASM_ROW_MAP = {
-    "Lamictal (Lamotrigine)  5mg/tab": ("Lamotrigine", 50),
-    "Lamictal (Lamotrigine)  50mg/tab": ("Lamotrigine", 50),
+    "Lamictal (Lamotrigine) 5mg/tab": ("Lamotrigine", 50),
+    "Lamictal (Lamotrigine) 50mg/tab": ("Lamotrigine", 50),
+    "Lamictal 5mg/tab (Lamotrigine)": ("Lamotrigine", 50),
+    "Lamictal 50mg/tab (Lamotrigine)": ("Lamotrigine", 50),
     "Lyrica 75mg/cap (Pregabalin)": ("Pregabalin", 75),
     "Topamax 100mg/tab (Topiramate)": ("Topiramate", 100),
     "Topamax 25mg/cap (Topiramate)": ("Topiramate", 25),
-    "Fycompa 2mg/tab (Perampanel)": ("Perampanel", 2),
+    "Fycompa 2mg/tab (Perampanel)": ("Perampanel", 1),
+    "Fycompa 2mg (Perampanel)": ("Perampanel", 1),
     "Keppra 500mg/tab (Levetiracetam)": ("Levetiracetam", 500),
+    "Keppra (Levetiracetam) 500mg/tab": ("Levetiracetam", 500),
     "Trileptal 300mg/tab (Oxcarbazepine)": ("Oxcarbazepine", 300),
+    "Trileptal 300mg (Oxcarbazepine)": ("Oxcarbazepine", 300),
     "Depakine 500mg/tab (Valproate)": ("Valproate", 500),
+    "Valproate (Depakine)": ("Valproate", 500),
     "Frisium 10mg/tab (Clobazam)": ("Clobazam", 10),
     "Frisium tab 10mg/tab (Clobazam)": ("Clobazam", 10),
+    "Clobazam tab 10mg/tab (Frisium)": ("Clobazam", 10),
     "Vimpat 100mg/tab (Lacosamide)": ("Lacosamide", 100),
+    "Vimpet 100mg/tab (Lacosamide)": ("Lacosamide", 100),
     "Zonegran 100mg/tab (Zonisamide)": ("Zonisamide", 100),
     "Carpine 200mg/tab (Carbamazepine)": ("Carbamazepine", 200),
     "Aclonax 0.5mg/tab (Clonazepam)": ("Clonazepam", 0.5),
     "Rivotril 0.5mg/tab (Clonazepam)": ("Clonazepam", 0.5),
     "Carbamazepine 200mg/tab (Carbamazepine)": ("Carbamazepine", 200),
+    "Carbamazepine C.R 200mg/tab (tegretol)": ("Carbamazepine", 200),
+    "Carbamazepine C.R": ("Carbamazepine", 200),
     "Tegretol CR 200mg/tab (Carbamazepine)": ("Carbamazepine", 200),
+    "Tegretol CR (Carbamazepine) 200mg/tab": ("Carbamazepine", 200),
     "Dilantin 100mg/cap (Phenytoin)": ("Phenytoin", 100),
+    "Dilantin (Phenytoin) 100mg/cap": ("Phenytoin", 100),
     "Phenytoin 100mg/cap": ("Phenytoin", 100),
-    "Fycompa 2mg": ("Perampanel", 2),
+    "Fycompa 2mg": ("Perampanel", 1),
     "Topiramate 25mg/cap": ("Topiramate", 25),
     "Topiramate 100mg/tab": ("Topiramate", 100),
+    "Topiramate (topamax) 25mg/cap": ("Topiramate", 25),
+    "Toporamate (topamax) 25mg/cap": ("Topiramate", 25),
+    "Topiramate (topamax) 25mg/tab": ("Topiramate", 25),
+    "Topiramate (topamax) 100mg/tab": ("Topiramate", 100),
+    "Toporamate (topamax) 100mg/tab": ("Topiramate", 100),
+    "Toporamate (topamax) 25mg/tab": ("Topiramate", 25),
+    "Toporamate (topamax) 25cap/tab": ("Topiramate", 25),
     "Phenobarbital 30mg/tab": ("Phenobarbital", 30),
     "Depakine 200mg/mL oral sol": ("Valproate", 200),
+    "Depakine Chrono 500mg/tab (Valproate)": ("Valproate", 500),
+    "Depakine Chrono 200mg/tab (Valproate)": ("Valproate", 200),
     "Depakine Chrono 500mg/tab": ("Valproate", 500),
     "Depakine Chrono 200mg/tab": ("Valproate", 200),
     "Risperdal 1 mg/tab": ("Risperidone", 1),
+    "Risperdal 1 mg/tab (Risperidone)": ("Risperidone", 1),
     "Tegretol 200mg/tab":("Carbamazepine", 200),
+    "Depakine 200mg/mL oral sol, 40 mL/btl (Valproate)": ("Valproate", 1),
+    "neurontin 300mg/cap (Gabapentin)" :("Gabapentin", 300),
 
 }
 
@@ -119,6 +157,9 @@ def extract_asm_timeline(target_table):
     df_ddd = df_raw.copy()
     cols_to_clear = df_raw.columns != 'Date'
     df_ddd.loc[:, cols_to_clear] = None
+    df_ddd = df_ddd.set_index('Date')
+    df_ddd = df_ddd.astype(float)
+    df_ddd.reset_index(inplace=True)
     df_ddd.drop("備註", axis=1, inplace=True)
     for label, data in df_raw.items():
         i = 0
@@ -126,6 +167,10 @@ def extract_asm_timeline(target_table):
             continue
         else:
             drug, mg_strength = ASM_ROW_MAP[label]
+            if drug not in df_ddd.columns:
+                df_ddd.rename({label: drug}, axis=1, inplace=True)
+            else:
+                df_ddd.drop(label, axis=1, inplace=True)
             ddd_den = DDD_MG[drug]
             for value in data:
                 if value:
@@ -134,17 +179,25 @@ def extract_asm_timeline(target_table):
                     for item in items:
                         units = re.findall(r"(\d+.\d+|\d+)", item)
                         freq = re.findall(r"(?<=/).*?(?=,|$)", item)
+                        if len(units) == 0 or len(freq) == 0:
+                            continue
                         if "PRN" in freq[0] and df_raw.loc[i, "備註"]:
                             continue
-                        try:
+                        if "多開" in freq[0]:
+                            continue
+                        if "PRN" in freq[0]:
+                            prn_freq = freq[0].split(" ")
+                            freq_multiplier = DRUG_FREQUENCY_MAP[prn_freq[0]]
+                        else:
                             freq_multiplier = DRUG_FREQUENCY_MAP[freq[0]]
-                            total_dose += float(units[0]) * freq_multiplier * mg_strength
-                        except Exception as e:
-                            print(e)
-                            print(freq[0])
+                        total_dose += float(units[0]) * freq_multiplier * mg_strength
+
                     ddd = total_dose / ddd_den
                     try:
-                        df_ddd.loc[i, label] = str(ddd)
+                        if not np.isnan(df_ddd.loc[i, drug]):
+                            df_ddd.loc[i, drug] += ddd
+                        else:
+                            df_ddd.loc[i, drug] = ddd
                         i+=1
                     except Exception as e:
                         print(e)
@@ -156,8 +209,7 @@ def extract_asm_timeline(target_table):
     df_ddd['Date'] = pd.to_datetime(df_ddd['Date'])
     df_ddd = df_ddd.set_index('Date')
     df_ddd = df_ddd.resample('ME').ffill()
-    df_ddd = df_ddd.astype(float)
-    df_ddd = df_ddd.round(4)
+    df_ddd = df_ddd.round(2)
 
 
     return df_ddd
@@ -193,10 +245,9 @@ if __name__ == "__main__":
         filetypes=[("Docx files", "*.Docx"), ("All files", "*.*")]
     )
     df = table_selection(file_path)
-    df.to_csv("test.csv")
     if df is not None:
-        print("DataFrame Shape:", df.shape)
-        print("\nFirst few rows:")
-        print(df.head())
-    # df.to_csv("asm_timeline.csv", index=False)
+        print(df.columns)
+    file_path = os.path.basename(file_path)
+    file_path = os.path.join("./new_csvs",file_path)
+    df.to_csv(file_path.replace(".docx", "_asm_timeline.csv"), index=True)
  
