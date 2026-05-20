@@ -23,6 +23,9 @@ DRUG_FREQUENCY_MAP = [
     ("QD", 1),
     ("QN", 1),
     ("as order", 1),
+    ("Q12H", 2),
+    ("Q8H", 3),
+    ("Q6H", 4),
 ]
 
 
@@ -306,7 +309,7 @@ def extract_asm_timeline(target_table):
                     df_ddd.loc[i, drug] = ddd
 
     # fill in empty months!
-    df_ddd['Date'] = pd.to_datetime(df_ddd['Date'])
+    df_ddd['Date'] = pd.to_datetime(df_ddd['Date'], errors='coerce')
     try:
         df_ddd.drop('是否為吳醫師看診(不是：0；是：1；無看診紀錄：-)', axis=1, inplace=True)
     except:
@@ -320,13 +323,13 @@ def extract_asm_timeline(target_table):
     return df_ddd
 
 
-def save_ddd_csv(df, output_path):
-    """Save the DDD DataFrame to CSV with proper encoding."""
-    import os
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
-    df.to_csv(output_path, index=True, encoding='utf-8-sig')
-    print(f"Saved ASM timeline to {output_path}")
-    return output_path
+# def save_ddd_csv(df, output_path):
+#     """Save the DDD DataFrame to CSV with proper encoding."""
+#     import os
+#     os.makedirs(os.path.dirname(output_path), exist_ok=True)
+#     df.to_csv(output_path, index=True, encoding='utf-8-sig')
+#     print(f"Saved ASM timeline to {output_path}")
+#     return output_path
 
 def table_selection(filepath):
     try:
@@ -349,18 +352,70 @@ def table_selection(filepath):
             continue
 
 
+def process_directory(input_dir, output_dir=None):
+    import glob
+
+    if output_dir is None:
+        output_dir = "./new_csvs"
+    os.makedirs(output_dir, exist_ok=True)
+
+    docx_files = glob.glob(os.path.join(input_dir, "*.docx"))
+    if not docx_files:
+        print(f"No .docx files found in {input_dir}")
+        return
+
+    print(f"Processing {len(docx_files)} file(s) from {input_dir}")
+    success, skipped, errors = [], [], []
+
+    for filepath in sorted(docx_files):
+        fname = os.path.basename(filepath)
+        try:
+            df = table_selection(filepath)
+        except Exception as e:
+            errors.append((fname, str(e)))
+            print(f"  ERROR {fname}: {e}")
+            continue
+
+        if df is None or df.empty:
+            skipped.append(fname)
+            print(f"  SKIP  {fname}: no ASM table found")
+            continue
+
+        out_path = os.path.join(output_dir, fname.replace(".docx", "_asm_timeline.csv"))
+        df.to_csv(out_path, index=True, encoding="utf-8-sig")
+        success.append((fname, list(df.columns)))
+        print(f"  OK    {fname} -> {out_path}")
+
+    print(f"\nDone: {len(success)} succeeded, {len(skipped)} skipped, {len(errors)} errors")
+    if errors:
+        print("Errors:")
+        for fname, err in errors:
+            print(f"  {fname}: {err}")
+
+
 if __name__ == "__main__":
-    # Test the function with the provided file
-    root = Tk()
-    root.withdraw()
-    file_path = askopenfilename(
-        title="Select Patient Docx File (Cancel to Exit)",
-        filetypes=[("Docx files", "*.Docx"), ("All files", "*.*")]
-    )
-    df = table_selection(file_path)
-    if df is not None:
-        print(df.columns)
-    file_path = os.path.basename(file_path)
-    file_path = os.path.join("./new_csvs",file_path)
-    df.to_csv(file_path.replace(".docx", "_asm_timeline.csv"), index=True)
+    import sys
+
+    if len(sys.argv) > 1:
+        input_dir = sys.argv[1]
+        output_dir = sys.argv[2] if len(sys.argv) > 2 else None
+        process_directory(input_dir, output_dir)
+    else:
+        root = Tk()
+        root.withdraw()
+        file_path = askopenfilename(
+            title="Select Patient Docx File (Cancel to Exit)",
+            filetypes=[("Docx files", "*.Docx"), ("All files", "*.*")]
+        )
+        if not file_path:
+            print("No file selected.")
+        else:
+            df = table_selection(file_path)
+            if df is not None:
+                print(df.columns.tolist())
+                os.makedirs("./new_csvs", exist_ok=True)
+                fname = os.path.basename(file_path)
+                out_path = os.path.join("./new_csvs", fname.replace(".docx", "_asm_timeline.csv"))
+                df.to_csv(out_path, index=True, encoding="utf-8-sig")
+                print(f"Saved to {out_path}")
  
