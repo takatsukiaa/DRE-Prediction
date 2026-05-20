@@ -5,6 +5,7 @@ import re
 from tkinter.filedialog import askopenfilename
 from tkinter import Tk
 import numpy as np
+from difflib import get_close_matches
 
 DRUG_FREQUENCY_MAP = [
     ("BIDPC (7 days)", 2),
@@ -31,6 +32,79 @@ def lookup_freq(freq_str):
             return multiplier
     return 1
 
+DRUG_ALIASES = {
+    "Toporamate": "Topiramate",
+    "Toporamate ": "Topiramate",
+    "Vimpet": "Lacosamide",
+    "Lmctal": "Lamotrigine",
+}
+
+
+def normalize_label(label):
+    label = label.replace("\n", " ").replace("\r", " ").replace("\xa0", " ")
+    label = re.sub(r"\s+", " ", label).strip()
+    label = re.sub(r"\(\s+", "(", label)
+    label = re.sub(r"\s+\)", ")", label)
+    return label
+
+
+def fuzzy_match_drug(name):
+    name_lower = name.lower()
+    for ddd_key in DDD_MG:
+        if ddd_key.lower() == name_lower:
+            return ddd_key
+    if name in DRUG_ALIASES:
+        return DRUG_ALIASES[name]
+    matches = get_close_matches(name, DDD_MG.keys(), n=1, cutoff=0.75)
+    if matches:
+        return matches[0]
+    name_title = name.title()
+    if name_title in DDD_MG:
+        return name_title
+    return None
+
+
+def extract_drug_from_label(label):
+    label = normalize_label(label)
+    paren_texts = re.findall(r"\(([^)]+)\)", label)
+    drug = None
+    mg_strength = None
+    for paren_text in reversed(paren_texts):
+        for part in re.split(r"\s*/\s*", paren_text):
+            candidate = fuzzy_match_drug(part.strip())
+            if candidate:
+                drug = candidate
+                break
+        if drug:
+            break
+    if not drug and paren_texts:
+        pass
+    if not drug:
+        words = re.split(r"\s+", re.sub(r"\([^)]*\)", "", label))
+        for word in words:
+            word = word.strip().rstrip(".")
+            if len(word) < 3:
+                continue
+            candidate = fuzzy_match_drug(word)
+            if candidate:
+                drug = candidate
+                break
+    dose_match = re.search(r"(\d+\.?\d*)\s*(mg|g)\s*/\s*(tab|cap|mL)", label)
+    if dose_match:
+        value = float(dose_match.group(1))
+        unit_mass = dose_match.group(2)
+        if unit_mass == "g":
+            value *= 1000
+        mg_strength = value
+    if drug and mg_strength is None:
+        for _, (mapped_drug, mapped_mg) in ASM_ROW_MAP.items():
+            if mapped_drug == drug:
+                mg_strength = mapped_mg
+                break
+    if drug and mg_strength is not None:
+        return (drug, mg_strength)
+    return None
+
 DDD_MG = {
         "Lamotrigine": 300,
         "Pregabalin": 300,
@@ -50,6 +124,7 @@ DDD_MG = {
         "Gabapentin" : 1800,
         "Diazepam" : 10,
         "Brivaracetam": 100,
+        "Vigabatrin": 2000,
 }
 
 # MAP CSV ROW → (drug_name, mg_per_unit)
@@ -190,48 +265,45 @@ def extract_asm_timeline(target_table):
     df_ddd.reset_index(inplace=True)
     df_ddd.drop("備註", axis=1, inplace=True)
     for label, data in df_raw.items():
-        i = 0
-        if label not in ASM_ROW_MAP:
+        if label in ("Date", "備註") or not label.strip():
             continue
+        result = extract_drug_from_label(label)
+        if result is None:
+            continue
+        drug, mg_strength = result
+        if drug not in df_ddd.columns:
+            df_ddd.rename({label: drug}, axis=1, inplace=True)
         else:
-            drug, mg_strength = ASM_ROW_MAP[label]
-            if drug not in df_ddd.columns:
-                df_ddd.rename({label: drug}, axis=1, inplace=True)
-            else:
-                df_ddd.drop(label, axis=1, inplace=True)
-            ddd_den = DDD_MG[drug]
-            for value in data:
-                if value:
-                    total_dose = 0
-                    items = value.split(',')
-                    for item in items:
-                        item = re.sub(r'[^a-zA-Z0-9./ ]', '', item)
-                        if not item.strip():
-                            continue
-                        units = re.findall(r"(\d+.\d+|\d+)", item)
-                        freq = re.findall(r"(?<=/).*?(?=,|$)", item)
-                        freq = re.sub(r'[\(\[\{].*?[\)\]\}]', '', freq[0]) if freq else []
-                        if len(units) == 0 or len(freq) == 0:
-                            continue
-                        if "PRN" in freq:
-                            continue
-                        if "多開" in freq:
-                            continue
-                        freq_multiplier = lookup_freq(freq)
-                        total_dose += float(units[0]) * freq_multiplier * mg_strength
-
-                    ddd = total_dose / ddd_den
-                    try:
-                        if not np.isnan(df_ddd.loc[i, drug]):
-                            df_ddd.loc[i, drug] += ddd
-                        else:
-                            df_ddd.loc[i, drug] = ddd
-                        i+=1
-                    except Exception as e:
-                        print(e)
-                else:
-                    i += 1
+            df_ddd.drop(label, axis=1, inplace=True)
+            continue
+        ddd_den = DDD_MG[drug]
+        for i, value in enumerate(data):
+            if not value:
+                continue
+            total_dose = 0
+            items = value.split(",")
+            for item in items:
+                item = re.sub(r"[^a-zA-Z0-9./ ]", "", item)
+                if not item.strip():
                     continue
+                units = re.findall(r"(\d+.\d+|\d+)", item)
+                freq = re.findall(r"(?<=/).*?(?=,|$)", item)
+                freq = re.sub(r"[\(\[\{].*?[\)\]\}]", "", freq[0]) if freq else []
+                if len(units) == 0 or len(freq) == 0:
+                    continue
+                if "PRN" in freq:
+                    continue
+                if "多開" in freq:
+                    continue
+                freq_multiplier = lookup_freq(freq)
+                total_dose += float(units[0]) * freq_multiplier * mg_strength
+
+            if total_dose > 0:
+                ddd = total_dose / ddd_den
+                if not np.isnan(df_ddd.loc[i, drug]):
+                    df_ddd.loc[i, drug] += ddd
+                else:
+                    df_ddd.loc[i, drug] = ddd
 
     # fill in empty months!
     df_ddd['Date'] = pd.to_datetime(df_ddd['Date'])
@@ -239,7 +311,7 @@ def extract_asm_timeline(target_table):
         df_ddd.drop('是否為吳醫師看診(不是：0；是：1；無看診紀錄：-)', axis=1, inplace=True)
     except:
         pass
-    # df_ddd.dropna(how='all', axis=1, inplace=True)
+    df_ddd.dropna(how="all", axis=1, inplace=True)
     df_ddd = df_ddd.set_index('Date')
     df_ddd = df_ddd.resample('ME').mean().ffill()
     df_ddd = df_ddd.round(2)
