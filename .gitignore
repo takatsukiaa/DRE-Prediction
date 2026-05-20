@@ -21,3 +21,4 @@ Plots_and_CSVs/
 old_code/
 .venv/
 __pycache__/
+*.docx
