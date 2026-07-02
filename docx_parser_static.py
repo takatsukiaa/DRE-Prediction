@@ -1,24 +1,42 @@
+import os
 import re
+import sys
+import io
+from contextlib import redirect_stdout
+from tkinter import Tk
 
 from docx import Document
-from tkinter.filedialog import askopenfilename
+from tkinter.filedialog import askdirectory
 import csv
 
-parsed_data = {
+DEFAULT_PARSED_DATA = {
     "Patient ID": "",
     "Birthday": "",
     "Gender": "",
     "1st Seizure Age": "",
-    "DRE": "",
     "Drug-refractory epilepsy": "",
     "Systemic disease": "",
     "Adverse of ASM": "",
     "Etiology": "",
     "Focal": "",
+    "Unknown whether focal or generalized (U)": "",
+    "Generalized (G)": "",
+    "Unclassified": "",
     "EEG Focality": "",
     "Mental Retardation": "",
     # other fields
 }
+
+parsed_data = DEFAULT_PARSED_DATA.copy()
+
+def reset_parsed_data():
+    parsed_data.clear()
+    parsed_data.update(DEFAULT_PARSED_DATA.copy())
+
+def safe_print(text=""):
+    encoding = sys.stdout.encoding or "utf-8"
+    print(str(text).encode(encoding, errors="backslashreplace").decode(encoding))
+
 def baseline_parsing(table):
     flat_cells = []
     visited_cells = set()
@@ -42,6 +60,8 @@ def baseline_parsing(table):
             if target in content:
                 # 假設 Value 就在下一個儲存格
                 if i + 1 < len(flat_cells):
+                    if target == "Patient ID":
+                        flat_cells[i + 1] = re.sub(r'\D', '', flat_cells[i + 1])
                     parsed_data[target] = flat_cells[i + 1]
             else:
                 continue
@@ -113,6 +133,7 @@ def eeg_parsing(table):
 
 
 def initial_table_selection(file_path):
+    reset_parsed_data()
     doc = Document(file_path)
     # List to store flattened data for CSV
     for table in doc.tables:
@@ -143,19 +164,81 @@ def initial_table_selection(file_path):
         else:
             continue
     print_parsed_data()
-    return parsed_data
-def save_to_csv(output_file):
+    return parsed_data.copy()
+
+def extract_static_data_from_docx(file_path, quiet=True):
+    if not quiet:
+        return initial_table_selection(file_path)
+    with redirect_stdout(io.StringIO()):
+        return initial_table_selection(file_path)
+
+def save_to_csv(data, output_file):
     # Since the source is a Key-Value pair table,
     # we can pair them into a dictionary for a standard CSV format
     
     with open(output_file, 'w', newline='', encoding='utf-8-sig') as f:
         writer = csv.writer(f)
-        writer.writerow(["# Metadata"])
-        row_to_write = [item for pair in parsed_data.items() for item in pair]
+        row_to_write = [item for pair in data.items() for item in pair]
         for i in range(0, len(row_to_write), 2):
             writer.writerow([row_to_write[i], row_to_write[i + 1]])
 
+def save_static_output(file_path, output_dir="./new_csvs/static_data"):
+    data = initial_table_selection(file_path)
+    os.makedirs(output_dir, exist_ok=True)
+    fname = os.path.basename(file_path)
+    base_name = fname[:-5] if fname.lower().endswith(".docx") else fname
+    output_file = os.path.join(output_dir, f"{base_name}_static_data.csv")
+    save_to_csv(data, output_file)
+    print(f"Saved to {output_file}")
+    return output_file
+
 def print_parsed_data():
     for key, value in parsed_data.items():
-        print(f"{key}: {value}")
-    print("\n")
+        safe_print(f"{key}: {value}")
+    safe_print("\n")
+
+def process_directory(input_dir, output_dir="./new_csvs/static_data"):
+    docx_files = [
+        os.path.join(input_dir, fname)
+        for fname in os.listdir(input_dir)
+        if fname.lower().endswith(".docx") and not fname.startswith("~$")
+    ]
+    if not docx_files:
+        print(f"No .docx files found in {input_dir}")
+        return
+
+    print(f"Processing {len(docx_files)} file(s) from {input_dir}")
+    success, skipped, errors = [], [], []
+
+    for file_path in sorted(docx_files):
+        fname = os.path.basename(file_path)
+        try:
+            out_path = save_static_output(file_path, output_dir)
+        except Exception as e:
+            errors.append((fname, str(e)))
+            print(f"ERROR {fname}: {e}")
+            continue
+
+        if out_path:
+            success.append((fname, out_path))
+            print(f"OK {fname}: saved {out_path}")
+        else:
+            skipped.append(fname)
+            print(f"SKIP {fname}: no static data saved")
+
+    print(f"\nDone: {len(success)} succeeded, {len(skipped)} skipped, {len(errors)} errors")
+    if errors:
+        print("Errors:")
+        for fname, err in errors:
+            print(f"  {fname}: {err}")
+
+if __name__ == "__main__":
+    root = Tk()
+    root.withdraw()
+    input_dir = askdirectory(
+        title="Select Folder Containing Patient Docx Files (Cancel to Exit)"
+    )
+    if not input_dir:
+        print("No folder selected.")
+    else:
+        process_directory(input_dir)

@@ -23,4 +23,4 @@ def inspect_tables(filepath, output_file):
             f.write("\n")
 
 if __name__ == "__main__":
-    inspect_tables(r"C:\Users\89665\Desktop\Epilepsy\DRE_Prediction\DRE\0003DRE.docx", "inspect_output.txt")
+    inspect_tables(r"C:\Users\89665\Desktop\Epilepsy\DRE_Prediction\DRE\0102 DRE4.docx", "inspect_output.txt")

@@ -230,6 +230,7 @@ def extract_asm_timeline(target_table):
     """
     # Find the header row (starts with 'Date')
     header_row_idx = -1
+    visited_cells = set()
     for i, row in enumerate(target_table.rows):
         first_cell_text = get_cell_text(row.cells[0])
         if first_cell_text == "Date":
@@ -244,6 +245,10 @@ def extract_asm_timeline(target_table):
     headers = []
     header_row = target_table.rows[header_row_idx]
     for cell in header_row.cells:
+        if cell._tc not in visited_cells:
+            visited_cells.add(cell._tc)
+        else:
+            continue
         headers.append(get_cell_text(cell))
         
     # Extract data rows
@@ -251,6 +256,10 @@ def extract_asm_timeline(target_table):
     for row in target_table.rows[header_row_idx + 1:]:
         row_data = []
         for cell in row.cells:
+            if cell._tc not in visited_cells:
+                visited_cells.add(cell._tc)
+            else:
+                continue
             row_data.append(get_cell_text(cell))
         
         # Skip rows that are entirely empty or don't have a date
@@ -317,6 +326,9 @@ def extract_asm_timeline(target_table):
     df_ddd.dropna(how="all", axis=1, inplace=True)
     df_ddd = df_ddd.set_index('Date')
     df_ddd = df_ddd.resample('ME').mean().ffill()
+    df_ddd['Total DDD'] = df_ddd.sum(axis=1)
+    df_ddd['Number of Drugs'] = df_ddd.count(axis=1)
+    df_ddd['Number of Drugs'] = df_ddd['Number of Drugs'] - 1
     df_ddd = df_ddd.round(2)
 
 
@@ -352,11 +364,15 @@ def table_selection(filepath):
             continue
 
 
+def extract_asm_timeline_from_docx(filepath):
+    return table_selection(filepath)
+
+
 def process_directory(input_dir, output_dir=None):
     import glob
 
     if output_dir is None:
-        output_dir = "./new_csvs"
+        output_dir = "./new_csvs/asm_timeline"
     os.makedirs(output_dir, exist_ok=True)
 
     docx_files = glob.glob(os.path.join(input_dir, "*.docx"))
