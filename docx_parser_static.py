@@ -18,16 +18,39 @@ DEFAULT_PARSED_DATA = {
     "Systemic disease": "",
     "Adverse of ASM": "",
     "Etiology": "",
+    "EEG Focality": "",
+    "Frequency (n/month)": "",
     "Focal": "",
     "Unknown whether focal or generalized (U)": "",
     "Generalized (G)": "",
     "Unclassified": "",
-    "EEG Focality": "",
+    "Elementary motor (Motor)": "",
+    "Complex  hypermotor (automatism)":"",
+    "Sensory":"",
+    "Cognitive and language": "",
+    "Autonomic (e.g. palpitation, sweating, hot flush, epigastric or abdominal raising)": "",
+    "Affective (emotional)": "",
+    "Aura (Indescribable)": "",
+    "Descriptor": "",
+    "Asymptomatic IED (EEG IED)": "",
+    "Provoking factor": "",
+    "Dx": "",
     "Mental Retardation": "",
     # other fields
 }
 
 parsed_data = DEFAULT_PARSED_DATA.copy()
+
+EEG_ELECTRODES = [
+    "Fp1", "F3", "F7", "Fp2", "F4", "F8", "Fz",
+    "T3", "T4", "T5", "T6", "S1", "S2",
+    "C3", "C4", "Cz", "P3", "P4", "Pz", "O1", "O2",
+]
+EEG_ELECTRODE_BY_CASEFOLD = {electrode.casefold(): electrode for electrode in EEG_ELECTRODES}
+EEG_ELECTRODE_PATTERN = re.compile(
+    "|".join(re.escape(electrode) for electrode in sorted(EEG_ELECTRODES, key=len, reverse=True)),
+    flags=re.IGNORECASE,
+)
 
 def reset_parsed_data():
     parsed_data.clear()
@@ -101,35 +124,33 @@ def etiology_parsing(table):
     temp = row.cells[3].text.strip().replace('\n', ' ')
     parsed_data["Mental Retardation"] = temp
 
-def eeg_parsing(table):
-    flat_cells = []
-    visited_cells = set()
-    pattern = r'\b[A-Z]+[0-9z][A-Z0-9]*\b'
-    for row in table.rows:
-        for cell in row.cells:
-            if cell._tc not in visited_cells:
-                visited_cells.add(cell._tc)
-                clean_text = cell.text.strip().replace('\n', ' ')
-                all_text_nodes = cell._tc.xpath('.//w:t')
-                xpath_text = "".join([node.text for node in all_text_nodes if node.text]).strip()
-                if len(xpath_text) > len(clean_text):
-                    parsed_text = xpath_text
-                else:
-                    parsed_text = clean_text
-                flat_cells.append(parsed_text)
-            else:
-                continue
+def extract_eeg_electrodes(text):
+    """Return canonical electrode names, including codes joined as T4T6 or T3T5."""
+    electrodes = []
+    seen = set()
+    for match in EEG_ELECTRODE_PATTERN.findall(str(text or "")):
+        electrode = EEG_ELECTRODE_BY_CASEFOLD[match.casefold()]
+        if electrode not in seen:
+            electrodes.append(electrode)
+            seen.add(electrode)
+    return electrodes
 
-    start_idx = 2
-    for i in enumerate(flat_cells):
-        text = flat_cells[start_idx]
-        start_idx += 2
-        if start_idx >= len(flat_cells):
-            break
-        matches = re.findall(pattern, text)
-        if matches:
-            matches = ", ".join(matches)
-            parsed_data["EEG Focality"] = matches
+def eeg_parsing(table):
+    selected_electrodes = []
+    seen = set()
+    for row in table.rows[1:]:
+        value_cell = row.cells[-1]
+        clean_text = value_cell.text.strip().replace('\n', ' ')
+        all_text_nodes = value_cell._tc.xpath('.//w:t')
+        xpath_text = "".join(node.text for node in all_text_nodes if node.text).strip()
+        value_text = xpath_text if len(xpath_text) > len(clean_text) else clean_text
+
+        for electrode in extract_eeg_electrodes(value_text):
+            if electrode not in seen:
+                selected_electrodes.append(electrode)
+                seen.add(electrode)
+
+    parsed_data["EEG Focality"] = ", ".join(selected_electrodes)
 
 
 def initial_table_selection(file_path):

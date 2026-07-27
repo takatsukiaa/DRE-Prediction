@@ -15,9 +15,31 @@ def normalize_row(row_data, width):
     return row_data[:width]
 
 
+LAB_DATE_PATTERN = re.compile(
+    r"^\s*(?P<year>\d{4})(?:(?P<compact_month>\d{2})(?P<compact_day>\d{2})"
+    r"|[-/](?P<separated_month>\d{1,2})[-/](?P<separated_day>\d{1,2}))(?!\d)"
+)
+
+
+def parse_lab_date(value):
+    if pd.isna(value):
+        return pd.NaT
+
+    match = LAB_DATE_PATTERN.match(str(value))
+    if not match:
+        return pd.NaT
+
+    month = match.group("compact_month") or match.group("separated_month")
+    day = match.group("compact_day") or match.group("separated_day")
+    try:
+        return pd.Timestamp(year=int(match.group("year")), month=int(month), day=int(day))
+    except ValueError:
+        return pd.NaT
+
+
 def prepare_date_index(df):
     df = df.copy()
-    df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
+    df['Date'] = df['Date'].map(parse_lab_date)
     df.dropna(subset=['Date'], inplace=True)
     df.set_index('Date', inplace=True)
     return df

@@ -22,3 +22,5 @@ old_code/
 .venv/
 __pycache__/
 *.docx
+/new_csvs
+/mysql_ready_csvs

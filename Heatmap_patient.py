@@ -15,6 +15,7 @@ import pandas as pd
 import docx_parser_asm
 import docx_parser_blood_test
 import docx_parser_cognitive
+import docx_parser_eeg_timeline
 import docx_parser_seizure
 import docx_parser_static
 
@@ -35,6 +36,38 @@ LAB_COLOR = "royalblue"
 LAB_ABNORMAL_COLOR = "crimson"
 COGNITIVE_COLOR = "blueviolet"
 COGNITIVE_FLAGGED_COLOR = "crimson"
+EEG_SLOW_COLOR = "gold"
+EEG_ED_COLOR = "limegreen"
+EEG_UNSPECIFIED_COLOR = "lightslategray"
+EEG_UNSPECIFIED_BURDEN_VALUE = 0.5
+EEG_UNSPECIFIED_RADIUS = 0.22
+
+ETIOLOGY_LIST = [
+    "Hypoxia at birth",
+    "Developmental delay",
+    "Cerebral palsy",
+    "Family history of epilepsy",
+    "Cerebral structure lesion",
+    "Cerebral trauma",
+    "Cerebral tumor",
+    "Cerebral infection",
+    "Cerebrovascular disorders",
+    "Cerebral immunologic disorders",
+    "Degenerative and other neurological conditions",
+    "Hydrocephalus",
+    "Brain Surgery",
+    "Encephalitis",
+]
+
+EEG_FOCALITY_GROUPS = {
+    "Frontal": ["Fp1", "F3", "F7", "Fp2", "F4", "F8", "Fz"],
+    "Temporal": ["T3", "T4", "T5", "T6", "S1", "S2"],
+    "Central": ["C3", "C4", "Cz"],
+    "Parietal": ["P3", "P4", "Pz"],
+    "Occipital": ["O1", "O2"],
+}
+
+FOCAL_TYPE_CODES = ["1.1", "1.2", "1.3", "2.1", "2.2", "2.3", "3.1", "3.2", "3.3", "4"]
 
 LAB_FEATURES = [
     "WBC(10^3/uL)",
@@ -125,6 +158,34 @@ COGNITIVE_MAX_SCORES = {
     "CASI_Q9": 10,
     "WAIS": 100,
 }
+
+EEG_GLOBAL_SLOW_ROWS = ["Delta waves", "Theta waves"]
+EEG_GLOBAL_ED_ROWS = ["Spike ED", "Sharp ED", "Sharpish configuration", "Spike-and-wave ED", "Periodic Discharge"]
+EEG_SLOW_REGION_ROWS = [
+    ("Temporal Slow-wave", "TL", "TR"),
+    ("Frontal Slow-wave", "FL", "FR"),
+    ("Occipital Slow-wave", "OL", "OR"),
+    ("Parietal Slow-wave", "PL", "PR"),
+    ("Central Slow-wave", "CL", "CR"),
+]
+EEG_ED_REGION_ROWS = [
+    ("Temporal ED", "TLED", "TRED"),
+    ("Frontal ED", "FLED", "FRED"),
+    ("Occipital ED", "OLED", "ORED"),
+    ("Parietal ED", "PLED", "PRED"),
+    ("Central ED", "CLED", "CRED"),
+]
+EEG_BASE_ROWS = (
+    EEG_GLOBAL_SLOW_ROWS
+    + EEG_GLOBAL_ED_ROWS
+    + [row for _label, left, right in EEG_SLOW_REGION_ROWS + EEG_ED_REGION_ROWS for row in (left, right)]
+)
+EEG_PLOT_ROWS = (
+    EEG_GLOBAL_SLOW_ROWS
+    + [label for label, _left, _right in EEG_SLOW_REGION_ROWS]
+    + EEG_GLOBAL_ED_ROWS
+    + [label for label, _left, _right in EEG_ED_REGION_ROWS]
+)
 
 
 def safe_print(text=""):
@@ -368,6 +429,40 @@ def build_cognitive_matrices(cognitive_df, month_axis):
     return matrix, flagged
 
 
+def build_eeg_matrix(eeg_df, month_axis):
+    matrix = pd.DataFrame(0.0, index=EEG_BASE_ROWS, columns=month_columns(month_axis))
+    if eeg_df is None or eeg_df.empty:
+        return matrix
+
+    working = eeg_df.copy()
+    if "month" in working.columns:
+        dates = pd.to_datetime(working["month"], format="%Y-%m", errors="coerce")
+        dates = dates.fillna(pd.to_datetime(working["month"], errors="coerce"))
+    elif "report_date" in working.columns:
+        dates = pd.to_datetime(working["report_date"], errors="coerce")
+    else:
+        dates = pd.to_datetime(working.index, errors="coerce")
+
+    working = working.loc[dates.notna()].copy()
+    if working.empty:
+        return matrix
+    working["_month"] = dates[dates.notna()].dt.to_period("M")
+
+    for feature in EEG_BASE_ROWS:
+        if feature not in working.columns:
+            continue
+        values = working[feature].map(clean_numeric_value).fillna(0)
+        by_month = values.groupby(working["_month"]).max()
+        for month, value in by_month.items():
+            column = month.strftime("%Y-%m")
+            if column in matrix.columns and pd.notna(value):
+                matrix.loc[feature, column] = float(value)
+
+    for label, left_column, right_column in EEG_SLOW_REGION_ROWS + EEG_ED_REGION_ROWS:
+        matrix.loc[label] = np.maximum(matrix.loc[left_column], matrix.loc[right_column])
+    return matrix
+
+
 def lab_is_abnormal(feature, value):
     low, high = LAB_NORMAL_RANGES.get(feature, (None, None))
     if pd.isna(value):
@@ -480,38 +575,345 @@ def draw_heatmap(
     plt.close(fig)
 
 
-def wrap_static_value(value, width=70):
+def eeg_burden_label(value):
+    if value <= EEG_UNSPECIFIED_BURDEN_VALUE:
+        return "U"
+    if value <= 1:
+        return "R"
+    if value <= 2:
+        return "In"
+    if value <= 3:
+        return "F"
+    return "C"
+
+
+def draw_eeg_burden_circle(ax, row_idx, col_idx, value, color):
+    if pd.isna(value) or value <= 0:
+        return
+    cx = col_idx + 0.5
+    cy = row_idx + 0.5
+    numeric_value = float(value)
+    if numeric_value <= EEG_UNSPECIFIED_BURDEN_VALUE:
+        radius = EEG_UNSPECIFIED_RADIUS
+        color = EEG_UNSPECIFIED_COLOR
+    else:
+        radius = 0.12 + 0.25 * (numeric_value / 3)
+    circle = patches.Circle((cx, cy), radius=radius, color=color, alpha=0.85, zorder=2)
+    ax.add_patch(circle)
+    ax.text(cx, cy, eeg_burden_label(numeric_value), ha="center", va="center", fontsize=5, color="black", zorder=3)
+
+
+def draw_eeg_lr_proportion(ax, row_idx, col_idx, left_value, right_value, color):
+    total = float(left_value) + float(right_value)
+    if total <= 0:
+        return
+
+    left_ratio = float(left_value) / total
+    right_ratio = float(right_value) / total
+    if left_ratio > 0:
+        ax.add_patch(
+            patches.Rectangle((col_idx, row_idx), left_ratio, 1.0, color=color, alpha=0.88, zorder=2)
+        )
+        ax.text(
+            col_idx + left_ratio / 2,
+            row_idx + 0.5,
+            "L",
+            ha="center",
+            va="center",
+            fontsize=5,
+            color="black",
+            zorder=3,
+        )
+
+    if left_ratio > 0 and right_ratio > 0:
+        ax.plot(
+            [col_idx + left_ratio, col_idx + left_ratio],
+            [row_idx, row_idx + 1],
+            color="black",
+            linewidth=0.7,
+            alpha=0.9,
+            zorder=4,
+        )
+
+    if right_ratio > 0:
+        ax.add_patch(
+            patches.Rectangle(
+                (col_idx + left_ratio, row_idx), right_ratio, 1.0, color=color, alpha=0.88, zorder=2
+            )
+        )
+        ax.text(
+            col_idx + left_ratio + right_ratio / 2,
+            row_idx + 0.5,
+            "R",
+            ha="center",
+            va="center",
+            fontsize=5,
+            color="black",
+            zorder=3,
+        )
+
+
+def draw_eeg_heatmap(matrix, output_path, title, dpi=DPI):
+    display_rows = [row for row in EEG_PLOT_ROWS if row in matrix.index]
+    if not display_rows:
+        raise ValueError("No EEG rows available for plotting.")
+
+    n_rows = len(display_rows)
+    n_cols = matrix.shape[1]
+    fig_width = max(12.0, min(72.0, 2.8 + n_cols * 0.18))
+    fig_height = max(5.0, min(48.0, 1.8 + n_rows * 0.42))
+    fig, ax = plt.subplots(figsize=(fig_width, fig_height), dpi=dpi)
+
+    ax.vlines(np.arange(n_cols + 1), 0, n_rows, color="#d9d9d9", linewidth=0.6, zorder=0)
+    ax.hlines(np.arange(n_rows + 1), 0, n_cols, color="#bdbdbd", linewidth=0.75, zorder=0)
+
+    slow_region_map = {label: (left, right) for label, left, right in EEG_SLOW_REGION_ROWS}
+    ed_region_map = {label: (left, right) for label, left, right in EEG_ED_REGION_ROWS}
+
+    for row_idx, feature in enumerate(display_rows):
+        for col_idx, value in enumerate(matrix.loc[feature]):
+            column = matrix.columns[col_idx]
+            if feature in slow_region_map:
+                left_column, right_column = slow_region_map[feature]
+                draw_eeg_lr_proportion(
+                    ax,
+                    row_idx,
+                    col_idx,
+                    matrix.loc[left_column, column],
+                    matrix.loc[right_column, column],
+                    EEG_SLOW_COLOR,
+                )
+            elif feature in ed_region_map:
+                left_column, right_column = ed_region_map[feature]
+                draw_eeg_lr_proportion(
+                    ax,
+                    row_idx,
+                    col_idx,
+                    matrix.loc[left_column, column],
+                    matrix.loc[right_column, column],
+                    EEG_ED_COLOR,
+                )
+            elif feature in EEG_GLOBAL_SLOW_ROWS:
+                draw_eeg_burden_circle(ax, row_idx, col_idx, value, EEG_SLOW_COLOR)
+            elif feature in EEG_GLOBAL_ED_ROWS:
+                draw_eeg_burden_circle(ax, row_idx, col_idx, value, EEG_ED_COLOR)
+
+    ax.set_xlim(0, n_cols)
+    ax.set_ylim(n_rows, 0)
+    ax.set_aspect("equal")
+    ax.set_title(title, fontsize=18, pad=12)
+    ax.set_yticks(np.arange(n_rows) + 0.5)
+    ax.set_yticklabels(display_rows, fontsize=8)
+
+    step = tick_step(n_cols)
+    tick_positions = np.arange(0, n_cols, step) + 0.5
+    tick_labels = [matrix.columns[idx] for idx in range(0, n_cols, step)]
+    ax.set_xticks(tick_positions)
+    ax.set_xticklabels(tick_labels, rotation=45, ha="right", fontsize=7)
+    ax.tick_params(axis="both", length=0)
+
+    for spine in ax.spines.values():
+        spine.set_color("#666666")
+        spine.set_linewidth(1.0)
+
+    fig.tight_layout()
+    fig.savefig(output_path, bbox_inches="tight", dpi=dpi)
+    plt.close(fig)
+
+
+def wrap_static_text(value, width):
     text = str(value or "").strip()
     if not text:
         return ""
-    return textwrap.fill(text, width=width, break_long_words=False)
+    return textwrap.fill(
+        text,
+        width=width,
+        break_long_words=True,
+        break_on_hyphens=False,
+    )
+
+
+def static_text_line_count(text):
+    if not text:
+        return 1
+    return max(1, text.count("\n") + 1)
+
+
+def draw_check_indicator(ax, x, y, is_active, color):
+    ax.scatter(
+        [x],
+        [y],
+        s=95,
+        facecolors=color if is_active else "none",
+        edgecolors=color if is_active else "#b6b6b6",
+        linewidths=1.1,
+        zorder=2,
+    )
+    if is_active:
+        ax.text(x, y, "V", color="white", ha="center", va="center", fontsize=6.5, fontweight="bold")
+
+
+def draw_etiology_checklist(ax, y_top, raw_value):
+    active_codes = {
+        int(code)
+        for code in re.findall(r"\d+", str(raw_value or ""))
+        if 1 <= int(code) <= len(ETIOLOGY_LIST)
+    }
+    ax.text(0.02, y_top - 0.30, "Etiology", fontsize=14, fontweight="bold", va="center")
+
+    first_row_y = y_top - 0.83
+    rows_per_column = (len(ETIOLOGY_LIST) + 1) // 2
+    for index, name in enumerate(ETIOLOGY_LIST):
+        column, row = divmod(index, rows_per_column)
+        x = 0.04 + column * 0.49
+        y = first_row_y - row * 0.43
+        code = index + 1
+        is_active = code in active_codes
+        draw_check_indicator(ax, x, y, is_active, "mediumpurple")
+        ax.text(
+            x + 0.025,
+            y,
+            f"{code}. {name}",
+            fontsize=9,
+            va="center",
+            fontweight="bold" if is_active else "normal",
+        )
+
+
+def draw_eeg_focality_checklist(ax, y_top, raw_value):
+    active_electrodes = {
+        electrode.casefold()
+        for electrode in docx_parser_static.extract_eeg_electrodes(raw_value)
+    }
+    ax.text(0.02, y_top - 0.30, "EEG Focality", fontsize=14, fontweight="bold", va="center")
+
+    first_row_y = y_top - 0.86
+    for row, (region, electrodes) in enumerate(EEG_FOCALITY_GROUPS.items()):
+        y = first_row_y - row * 0.52
+        ax.text(0.02, y, region, fontsize=10, fontweight="bold", color="darkorange", va="center")
+        for column, electrode in enumerate(electrodes):
+            x = 0.18 + column * 0.115
+            is_active = electrode.casefold() in active_electrodes
+            draw_check_indicator(ax, x, y, is_active, "orange")
+            ax.text(
+                x + 0.018,
+                y,
+                electrode,
+                fontsize=9,
+                va="center",
+                fontweight="bold" if is_active else "normal",
+            )
+
+
+def draw_focal_type_checklist(ax, y_top, raw_value):
+    active_codes = set(re.findall(r"\d+\.\d+|\d+", str(raw_value or "")))
+    ax.text(
+        0.02,
+        y_top - 0.30,
+        "Seizure Type (Focal/Gen)",
+        fontsize=14,
+        fontweight="bold",
+        va="center",
+    )
+
+    for index, code in enumerate(FOCAL_TYPE_CODES):
+        column, row = index % 5, index // 5
+        x = 0.04 + column * 0.19
+        y = y_top - 0.82 - row * 0.52
+        is_active = code in active_codes
+        draw_check_indicator(ax, x, y, is_active, "crimson")
+        ax.text(
+            x + 0.025,
+            y,
+            code,
+            fontsize=10,
+            va="center",
+            fontweight="bold" if is_active else "normal",
+        )
 
 
 def plot_static_data(static_data, output_path, title="Static Data", dpi=DPI):
-    items = [(key, wrap_static_value(value)) for key, value in static_data.items()]
+    special_fields = {"etiology", "focal", "eeg focality"}
+    items = [
+        (wrap_static_text(key, width=26), wrap_static_text(value, width=78))
+        for key, value in static_data.items()
+        if str(key).strip().casefold() not in special_fields
+    ]
     if not items:
         items = [("Static data", "No static data extracted")]
 
-    n_rows = len(items)
-    fig_height = max(5.0, 1.4 + n_rows * 0.42)
+    etiology_value = next(
+        (value for key, value in static_data.items() if str(key).strip().casefold() == "etiology"),
+        "",
+    )
+    eeg_focality_value = next(
+        (value for key, value in static_data.items() if str(key).strip().casefold() == "eeg focality"),
+        "",
+    )
+    focal_type_value = next(
+        (value for key, value in static_data.items() if str(key).strip().casefold() == "focal"),
+        "",
+    )
+
+    row_heights = []
+    for key, value in items:
+        line_count = max(static_text_line_count(key), static_text_line_count(value))
+        row_heights.append(max(0.72, 0.34 * line_count + 0.34))
+
+    table_header_height = 1.35
+    etiology_height = 3.75
+    focal_type_height = 1.75
+    eeg_focality_height = 3.35
+    section_gap = 0.20
+    bottom_padding = 0.25
+    total_height = (
+        table_header_height
+        + sum(row_heights)
+        + section_gap
+        + etiology_height
+        + section_gap
+        + focal_type_height
+        + section_gap
+        + eeg_focality_height
+        + bottom_padding
+    )
+    fig_height = max(5.0, min(80.0, total_height * 0.55))
     fig, ax = plt.subplots(figsize=(12, fig_height), dpi=dpi)
     ax.axis("off")
     ax.set_xlim(0, 1)
-    ax.set_ylim(0, n_rows + 1)
+    ax.set_ylim(0, total_height)
 
-    ax.text(0.02, n_rows + 0.55, title, fontsize=18, fontweight="bold", va="center")
-    ax.text(0.02, n_rows + 0.05, "Field", fontsize=11, fontweight="bold", va="center")
-    ax.text(0.34, n_rows + 0.05, "Value", fontsize=11, fontweight="bold", va="center")
-    ax.hlines(n_rows - 0.2, 0.02, 0.98, color="#666666", linewidth=1.0)
+    title_y = total_height - 0.4
+    header_y = total_height - 1.0
+    table_top = total_height - table_header_height
+    ax.text(0.02, title_y, title, fontsize=18, fontweight="bold", va="center")
+    ax.text(0.02, header_y, "Field", fontsize=11, fontweight="bold", va="center")
+    ax.text(0.34, header_y, "Value", fontsize=11, fontweight="bold", va="center")
+    ax.hlines(table_top, 0.02, 0.98, color="#666666", linewidth=1.0)
 
-    for idx, (key, value) in enumerate(items):
-        y = n_rows - idx - 0.65
+    y_top = table_top
+    for idx, ((key, value), row_height) in enumerate(zip(items, row_heights)):
+        y_bottom = y_top - row_height
         if idx % 2 == 0:
             ax.add_patch(
-                patches.Rectangle((0.02, y - 0.22), 0.96, 0.38, color="#f2f2f2", zorder=0)
+                patches.Rectangle((0.02, y_bottom), 0.96, row_height, color="#f2f2f2", zorder=0)
             )
-        ax.text(0.02, y, key, fontsize=10, fontweight="bold", va="center")
-        ax.text(0.34, y, value, fontsize=10, va="center")
+        text_y = y_top - 0.17
+        ax.text(0.02, text_y, key, fontsize=10, fontweight="bold", va="top", linespacing=1.15)
+        ax.text(0.34, text_y, value, fontsize=10, va="top", linespacing=1.15)
+        y_top = y_bottom
+
+    y_top -= section_gap
+    ax.hlines(y_top, 0.02, 0.98, color="#cccccc", linewidth=0.8)
+    draw_etiology_checklist(ax, y_top, etiology_value)
+
+    y_top -= etiology_height + section_gap
+    ax.hlines(y_top, 0.02, 0.98, color="#cccccc", linewidth=0.8)
+    draw_focal_type_checklist(ax, y_top, focal_type_value)
+
+    y_top -= focal_type_height + section_gap
+    ax.hlines(y_top, 0.02, 0.98, color="#cccccc", linewidth=0.8)
+    draw_eeg_focality_checklist(ax, y_top, eeg_focality_value)
 
     fig.tight_layout()
     fig.savefig(output_path, bbox_inches="tight", dpi=dpi)
@@ -521,6 +923,7 @@ def plot_static_data(static_data, output_path, title="Static Data", dpi=DPI):
 def save_category_plots(stem, output_dir, matrices):
     asm_matrix = matrices["asm"]
     seizure_matrix = matrices["seizure"]
+    eeg_matrix = matrices["eeg"]
     lab_matrix = matrices["lab"]
     cognitive_matrix, cognitive_flagged = matrices["cognitive"]
     static_data = matrices["static"]
@@ -542,6 +945,9 @@ def save_category_plots(stem, output_dir, matrices):
         "Seizure",
         lambda _feature, _value, _row, _col: SEIZURE_COLOR,
     )
+
+    outputs["eeg"] = output_dir / f"{stem}_eeg_heatmap.png"
+    draw_eeg_heatmap(eeg_matrix, outputs["eeg"], "EEG Timeline")
 
     outputs["lab"] = output_dir / f"{stem}_lab_heatmap.png"
     draw_heatmap(
@@ -581,6 +987,13 @@ def build_patient_matrices(docx_path, start_month=None, end_month=None):
         seizure_df = None
         errors.append(("seizure", str(exc)))
     matrices["seizure"] = build_seizure_matrix(seizure_df, month_axis)
+
+    try:
+        eeg_df = docx_parser_eeg_timeline.table_selection(str(docx_path))
+    except Exception as exc:
+        eeg_df = None
+        errors.append(("eeg", str(exc)))
+    matrices["eeg"] = build_eeg_matrix(eeg_df, month_axis)
 
     try:
         lab_result = docx_parser_blood_test.extract_lab_timeline_from_docx(str(docx_path))
@@ -711,7 +1124,7 @@ def choose_gui_inputs():
 def main():
     parser = argparse.ArgumentParser(
         description=(
-            "Create per-patient ASM, seizure, lab, cognitive, and static-data PNGs "
+            "Create per-patient ASM, seizure, EEG, lab, cognitive, and static-data PNGs "
             "directly from DOCX files."
         )
     )
