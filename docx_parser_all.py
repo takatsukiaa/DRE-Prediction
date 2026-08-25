@@ -720,7 +720,7 @@ def parse_static(doc, path: Path, patient_id: str, cohort: str, errors: list[dic
 
 DRUG_FREQUENCY_MAP = [
     ("BIDPC (7 DAYS)", 2.0), ("BIDPC", 2.0), ("BID", 2.0),
-    ("TIDPC", 3.0), ("TID", 3.0), ("QDPC", 1.0), ("QNPC", 1.0),
+    ("TIDPC", 3.0), ("TID", 3.0), ("QID", 4.0), ("QDPC", 1.0), ("QNPC", 1.0),
     ("QDLUNCH", 1.0), ("QO HS", 0.5), ("QOHS", 0.5), ("QOD", 0.5),
     ("HS", 1.0), ("QD", 1.0), ("QN", 1.0), ("AS ORDER", 1.0),
     ("Q12H", 2.0), ("Q8H", 3.0), ("Q6H", 4.0),
@@ -754,19 +754,35 @@ UNIT_DOSE_FALLBACKS = {
     "valproate (depakine)": (500.0, "mg/tab"),
     "carbamazepine c.r": (200.0, "mg/tab"),
     "toporamate (topamax) 25cap/tab": (25.0, "mg/tab"),
+    "gabapentin (neurontin)": (300.0, "mg/cap"),
 }
 
 INSTRUCTION_RE = re.compile(
-    r"(?P<dose>\d+(?:\.\d+)?)\s*(?P<unit>tabs?|tablets?|caps?|capsules?|ml|#)?\s*/\s*"
+    r"(?P<dose>\d+(?:\.\d+)?)\s*"
+    r"(?P<unit>tabs?|tablets?|caps?|capsules?|tan|ml|mg|g|#)?\s*"
+    r"(?:/\s*|\s+)"
     r"(?P<frequency>[A-Za-z][A-Za-z0-9 ]*(?:\([^)]*\))?)",
     re.IGNORECASE,
 )
 
+COMPOUND_INSTRUCTION_BOUNDARY_RE = re.compile(
+    r"(?i)(?<=\S)\s+(?="
+    r"\d+(?:\.\d+)?\s*(?:tabs?|tablets?|caps?|capsules?|tan|ml|mg|g|#)\s*"
+    r"(?:/|\s+(?:BID|TID|QID|QD|QN|HS|Q\d+H|QO\s*HS|QOD|QW\s*[1-7]+|AS\s+OD?ER))"
+    r")"
+)
+
+ASM_DATE_CORRECTIONS = {("0199", "21090221"): "20190221"}
+MIN_ASM_YEAR = 1900
+
 
 def lookup_frequency(value: str) -> float | None:
-    upper = normalize_text(value).upper()
+    upper = re.sub(r"(?i)\bAS\s+ODER\b", "AS ORDER", normalize_text(value)).upper()
     if "PRN" in upper:
         return None
+    weekly = re.search(r"\bQW\s*([1-7]+)\b", upper)
+    if weekly:
+        return len(set(weekly.group(1))) / 7.0
     for keyword, multiplier in DRUG_FREQUENCY_MAP:
         if keyword in upper:
             return multiplier
@@ -815,6 +831,7 @@ def unit_dose_from_label(label: str) -> tuple[float | None, str | None]:
 
 def split_instructions(value: str) -> list[str]:
     text = normalize_text(value).replace("\n", ";")
+    text = COMPOUND_INSTRUCTION_BOUNDARY_RE.sub(";", text)
     pieces = [part.strip() for part in re.split(r"[;,]+", text) if part.strip()]
     return pieces or ([text] if text else [])
 
@@ -824,22 +841,68 @@ def parse_instruction(value: str) -> tuple[float | None, str | None, str, float 
     if match:
         dose = float(match.group("dose"))
         unit = (match.group("unit") or "").casefold()
-        if unit.startswith("tab"):
+        if unit.startswith("tab") or unit == "tan":
             unit = "tab"
         elif unit.startswith("cap"):
             unit = "cap"
         elif unit == "ml":
             unit = "mL"
         unit = unit or None
-        frequency = normalize_text(match.group("frequency"))
+        frequency = re.sub(
+            r"(?i)\bAS\s+ODER\b", "as order", normalize_text(match.group("frequency"))
+        )
         return dose, unit, frequency, lookup_frequency(frequency)
 
     dose_match = re.search(r"\d+(?:\.\d+)?", value)
     frequency = normalize_text(value.split("/", 1)[1]) if "/" in value else ""
+    frequency = re.sub(r"(?i)\bAS\s+ODER\b", "as order", frequency)
     dose = float(dose_match.group(0)) if dose_match else None
-    unit_match = re.search(r"(?i)\b(tab(?:let)?s?|cap(?:sule)?s?|ml)\b", value)
+    unit_match = re.search(r"(?i)\b(tab(?:let)?s?|tan|cap(?:sule)?s?|ml|mg|g)\b|#", value)
     unit = unit_match.group(0) if unit_match else None
+    if unit:
+        lowered = unit.casefold()
+        if lowered.startswith("tab") or lowered == "tan":
+            unit = "tab"
+        elif lowered.startswith("cap"):
+            unit = "cap"
+        elif lowered == "ml":
+            unit = "mL"
+        else:
+            unit = lowered
     return dose, unit, frequency, lookup_frequency(frequency) if frequency else None
+
+
+def calculate_daily_dose_mg(
+    unit_dose: float | None,
+    unit_dose_unit: str | None,
+    administered_dose: float | None,
+    administration_unit: str | None,
+    frequency_per_day: float | None,
+) -> float | None:
+    if administered_dose is None or frequency_per_day is None:
+        return None
+    administration = normalize_text(administration_unit).casefold()
+    if administration == "mg":
+        return administered_dose * frequency_per_day
+    if administration == "g":
+        return administered_dose * 1000.0 * frequency_per_day
+    if unit_dose is None:
+        return None
+    if administration == "ml" and normalize_text(unit_dose_unit).casefold() != "mg/ml":
+        return None
+    return unit_dose * administered_dose * frequency_per_day
+
+
+def parse_asm_date(value: object, patient_id: str) -> tuple[pd.Timestamp, str | None]:
+    text = normalize_text(value)
+    corrected = ASM_DATE_CORRECTIONS.get((patient_id, text))
+    parsed = parse_date(corrected or text)
+    if pd.isna(parsed):
+        return pd.NaT, corrected
+    maximum_year = pd.Timestamp.today().year + 1
+    if not MIN_ASM_YEAR <= parsed.year <= maximum_year:
+        return pd.NaT, corrected
+    return parsed, corrected
 
 
 def month_end(value: pd.Timestamp) -> pd.Timestamp:
@@ -866,6 +929,7 @@ def parse_asm(doc, path: Path, patient_id: str, cohort: str, errors: list[dict])
 
     observed: dict[tuple[str, pd.Period], tuple[pd.Timestamp, list[dict]]] = {}
     all_dates: list[pd.Timestamp] = []
+    dated_states: dict[pd.Timestamp, dict[str, bool]] = {}
     ignored_headers = {"date", "備註", "是否為吳醫師看診(不是：0；是：1；無看診紀錄：-)"}
 
     for row_number, source_row in enumerate(target.rows[header_index + 1 :], start=header_index + 2):
@@ -873,7 +937,13 @@ def parse_asm(doc, path: Path, patient_id: str, cohort: str, errors: list[dict])
         if not values or not any(values):
             continue
         values += [""] * max(0, len(headers) - len(values))
-        observed_date = parse_date(values[0])
+        observed_date, corrected_date = parse_asm_date(values[0], patient_id)
+        if corrected_date is not None:
+            add_error(
+                errors, path, patient_id, cohort, "asm", "corrected_source_date",
+                f"Corrected ASM date {values[0]} to {corrected_date}.",
+                row_number, f"{values[0]} -> {corrected_date}",
+            )
         if pd.isna(observed_date):
             if values[0]:
                 add_error(
@@ -884,11 +954,18 @@ def parse_asm(doc, path: Path, patient_id: str, cohort: str, errors: list[dict])
         observed_date = observed_date.normalize()
         all_dates.append(observed_date)
         period = observed_date.to_period("M")
+        row_state = dated_states.setdefault(observed_date, {})
 
         for drug_label, cell_value in zip(headers[1:], values[1:]):
-            if normalize_text(drug_label) in ignored_headers or not normalize_text(cell_value):
+            if normalize_text(drug_label) in ignored_headers:
                 continue
             generic_name = canonical_drug_name(drug_label)
+            if generic_name is not None:
+                row_state[generic_name] = row_state.get(generic_name, False) or bool(
+                    normalize_text(cell_value)
+                )
+            if not normalize_text(cell_value):
+                continue
             if generic_name is None:
                 add_error(
                     errors, path, patient_id, cohort, "asm", "unknown_drug",
@@ -905,10 +982,12 @@ def parse_asm(doc, path: Path, patient_id: str, cohort: str, errors: list[dict])
             regimen: list[dict] = []
             for instruction in split_instructions(cell_value):
                 administered, administration_unit, frequency, frequency_per_day = parse_instruction(instruction)
-                daily_dose = (
-                    unit_dose * administered * frequency_per_day
-                    if unit_dose is not None and administered is not None and frequency_per_day is not None
-                    else None
+                daily_dose = calculate_daily_dose_mg(
+                    unit_dose,
+                    unit_dose_unit,
+                    administered,
+                    administration_unit,
+                    frequency_per_day,
                 )
                 ddd = daily_dose / DDD_MG[generic_name] if daily_dose is not None else None
                 regimen.append(
@@ -940,6 +1019,17 @@ def parse_asm(doc, path: Path, patient_id: str, cohort: str, errors: list[dict])
     if not all_dates or not observed:
         return []
 
+    stop_events: dict[tuple[str, pd.Period], pd.Timestamp] = {}
+    for state_date in sorted(dated_states):
+        state = dated_states[state_date]
+        for generic_name, has_instruction in state.items():
+            if has_instruction:
+                continue
+            key = (generic_name, state_date.to_period("M"))
+            previous = stop_events.get(key)
+            if previous is None or state_date > previous:
+                stop_events[key] = state_date
+
     first_period = min(all_dates).to_period("M")
     last_period = max(all_dates).to_period("M")
     months = pd.period_range(first_period, last_period, freq="M")
@@ -950,7 +1040,11 @@ def parse_asm(doc, path: Path, patient_id: str, cohort: str, errors: list[dict])
         latest: tuple[pd.Timestamp, list[dict]] | None = None
         for period in months:
             current = observed.get((generic_name, period))
-            if current is not None:
+            stop_date = stop_events.get((generic_name, period))
+            if stop_date is not None and (current is None or stop_date >= current[0]):
+                latest = None
+                current = None
+            elif current is not None:
                 latest = current
             if latest is None:
                 continue
@@ -974,8 +1068,10 @@ def parse_asm(doc, path: Path, patient_id: str, cohort: str, errors: list[dict])
     by_month: dict[pd.Timestamp, list[dict]] = defaultdict(list)
     for item in result:
         by_month[item["date"]].append(item)
-    for date in sorted(by_month):
-        prescriptions = by_month[date]
+    visit_periods = {date.to_period("M") for date in all_dates}
+    for period in months:
+        date = period.to_timestamp("M")
+        prescriptions = by_month.get(date, [])
         total = sum(item["ddd"] for item in prescriptions if item["ddd"] is not None)
         count = len({item["generic_name"] for item in prescriptions if item["ddd"] is not None})
         summary = {column: pd.NA for column in ASM_COLUMNS}
@@ -987,8 +1083,10 @@ def parse_asm(doc, path: Path, patient_id: str, cohort: str, errors: list[dict])
                 "record_type": "monthly_summary",
                 "total_ddd": round(total, 2),
                 "number_of_drugs": count,
-                "is_carried_forward": all(
-                    bool(item["is_carried_forward"]) for item in prescriptions
+                "is_carried_forward": (
+                    False
+                    if period in visit_periods
+                    else all(bool(item["is_carried_forward"]) for item in prescriptions)
                 ),
             }
         )
