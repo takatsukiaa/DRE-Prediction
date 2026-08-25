@@ -212,6 +212,80 @@ def asm_row(**overrides):
     return row
 
 
+def build_asm_regression_docx(path: Path) -> None:
+    doc = Document()
+    table = doc.add_table(rows=1, cols=9)
+    add_rows(
+        table,
+        [
+            ["ASM狀況", "", "", "", "", "", "", "", ""],
+            [
+                "Date",
+                "Fycompa 2mg/tab (Perampanel)",
+                "Depakine 200mg/mL oral sol, 40 mL/btl (Valproate)",
+                "Dilantin 100mg/cap(Phenytoin)",
+                "Lamictal (Lamotrigine) 5mg/tab",
+                "Keppra 500mg/tab(Levetiracetam)",
+                "Carbamazepine C.R 200mg/tab (tegretol)",
+                "Dupin 5mg/tab (Diazepam)",
+                "Frisium 10mg/tab (Clobazam)",
+            ],
+            [
+                "2025-01-15",
+                "2 mg/HS",
+                "400 mg/BID",
+                "3 cap/QW1357 4 cap/QW246",
+                "2 tan/BIDPC",
+                "1 tab/QID",
+                "0.5 tab QOHS",
+                "1 tab/as oder",
+                "1 tab/PRN",
+            ],
+        ],
+    )
+    doc.save(path)
+
+
+def build_asm_date_docx(path: Path) -> None:
+    doc = Document()
+    table = doc.add_table(rows=1, cols=2)
+    add_rows(
+        table,
+        [
+            ["ASM狀況", ""],
+            ["Date", "Zonegran 100mg/tab (Zonisamide)"],
+            ["20141213", "1 tab/BID"],
+            ["21090221", "1 tab/BID"],
+            ["20260126", "1 tab/BID"],
+        ],
+    )
+    doc.save(path)
+
+
+def build_asm_blank_state_docx(path: Path) -> None:
+    doc = Document()
+    table = doc.add_table(rows=1, cols=3)
+    add_rows(
+        table,
+        [
+            ["ASM狀況", "", ""],
+            [
+                "Date",
+                "Dilantin 100mg/cap(Phenytoin)",
+                "Zonegran 100mg/tab (Zonisamide)",
+            ],
+            ["2020-01-15", "1 cap/HS", "1 tab/HS"],
+            ["2020-04-19", "", "1 tab/HS"],
+            ["2020-06-10", "", ""],
+            ["2020-06-20", "", "1 tab/HS"],
+            ["2020-07-10", "", ""],
+            ["2020-08-10", "", "1 tab/HS"],
+            ["2021-01-10", "1 cap/HS", "1 tab/HS"],
+        ],
+    )
+    doc.save(path)
+
+
 class ConsolidatedParserTests(unittest.TestCase):
     def test_complete_document_and_asm_detail(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -294,6 +368,110 @@ class ConsolidatedParserTests(unittest.TestCase):
         self.assertTrue(mmse_questions["value"].isna().all())
         self.assertEqual(set(result["brain_image"]["field_name"]), {"MRI", "CT", "SPECT"})
         self.assertNotIn("record_number", result["brain_image"].columns)
+
+    def test_unit_aware_doses_and_expanded_asm_schedules(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = Path(temp_dir) / "0198_DRE.docx"
+            build_asm_regression_docx(path)
+            result = parser.parse_docx_files(path)
+
+        prescriptions = result["asm"][result["asm"]["record_type"].eq("prescription")]
+
+        perampanel = prescriptions[prescriptions["generic_name"].eq("Perampanel")].iloc[0]
+        self.assertEqual(perampanel["administration_unit"], "mg")
+        self.assertEqual(float(perampanel["daily_dose_mg"]), 2.0)
+        self.assertEqual(float(perampanel["ddd"]), 0.25)
+
+        valproate = prescriptions[prescriptions["generic_name"].eq("Valproate")].iloc[0]
+        self.assertEqual(valproate["administration_unit"], "mg")
+        self.assertEqual(float(valproate["daily_dose_mg"]), 800.0)
+        self.assertAlmostEqual(float(valproate["ddd"]), 800.0 / 1500.0)
+
+        phenytoin = prescriptions[prescriptions["generic_name"].eq("Phenytoin")]
+        self.assertEqual(phenytoin["raw_instruction"].tolist(), ["3 cap/QW1357", "4 cap/QW246"])
+        self.assertAlmostEqual(float(phenytoin["frequency_per_day"].sum()), 1.0)
+        self.assertAlmostEqual(float(phenytoin["daily_dose_mg"].sum()), 2400.0 / 7.0)
+
+        lamotrigine = prescriptions[prescriptions["generic_name"].eq("Lamotrigine")].iloc[0]
+        self.assertEqual(lamotrigine["administration_unit"], "tab")
+        self.assertEqual(float(lamotrigine["daily_dose_mg"]), 20.0)
+
+        levetiracetam = prescriptions[prescriptions["generic_name"].eq("Levetiracetam")].iloc[0]
+        self.assertEqual(float(levetiracetam["frequency_per_day"]), 4.0)
+        self.assertEqual(float(levetiracetam["daily_dose_mg"]), 2000.0)
+
+        carbamazepine = prescriptions[prescriptions["generic_name"].eq("Carbamazepine")].iloc[0]
+        self.assertEqual(carbamazepine["frequency"], "QOHS")
+        self.assertEqual(float(carbamazepine["frequency_per_day"]), 0.5)
+        self.assertEqual(float(carbamazepine["daily_dose_mg"]), 50.0)
+
+        diazepam = prescriptions[prescriptions["generic_name"].eq("Diazepam")].iloc[0]
+        self.assertEqual(diazepam["frequency"], "as order")
+        self.assertEqual(float(diazepam["frequency_per_day"]), 1.0)
+
+        clobazam = prescriptions[prescriptions["generic_name"].eq("Clobazam")].iloc[0]
+        self.assertEqual(clobazam["frequency"], "PRN")
+        self.assertTrue(pd.isna(clobazam["frequency_per_day"]))
+        self.assertTrue(pd.isna(clobazam["ddd"]))
+
+        summary = result["asm"][result["asm"]["record_type"].eq("monthly_summary")].iloc[0]
+        self.assertEqual(int(summary["number_of_drugs"]), 7)
+
+    def test_asm_source_date_correction_and_plausibility(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = Path(temp_dir) / "0199_DRE.docx"
+            build_asm_date_docx(path)
+            result = parser.parse_docx_files(path)
+
+        prescriptions = result["asm"][result["asm"]["record_type"].eq("prescription")]
+        self.assertEqual(len(prescriptions), 134)
+        self.assertEqual(prescriptions["date"].min(), pd.Timestamp("2014-12-31"))
+        self.assertEqual(prescriptions["date"].max(), pd.Timestamp("2026-01-31"))
+        corrections = result["parse_errors"][
+            result["parse_errors"]["error_type"].eq("corrected_source_date")
+        ]
+        self.assertEqual(len(corrections), 1)
+        self.assertEqual(corrections.iloc[0]["evidence"], "21090221 -> 20190221")
+
+        invalid_date, correction = parser.parse_asm_date("21090221", "0200")
+        self.assertTrue(pd.isna(invalid_date))
+        self.assertIsNone(correction)
+
+    def test_blank_asm_cells_stop_carry_forward_and_later_values_restart(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = Path(temp_dir) / "0005_NDRE.docx"
+            build_asm_blank_state_docx(path)
+            result = parser.parse_docx_files(path)
+
+        asm = result["asm"]
+        prescriptions = asm[asm["record_type"].eq("prescription")]
+        phenytoin = prescriptions[prescriptions["generic_name"].eq("Phenytoin")]
+        self.assertEqual(
+            phenytoin["date"].tolist(),
+            [
+                pd.Timestamp("2020-01-31"),
+                pd.Timestamp("2020-02-29"),
+                pd.Timestamp("2020-03-31"),
+                pd.Timestamp("2021-01-31"),
+            ],
+        )
+        self.assertFalse(bool(phenytoin.iloc[-1]["is_carried_forward"]))
+
+        zonisamide = prescriptions[prescriptions["generic_name"].eq("Zonisamide")]
+        self.assertIn(pd.Timestamp("2020-06-30"), zonisamide["date"].tolist())
+        june = zonisamide[zonisamide["date"].eq(pd.Timestamp("2020-06-30"))].iloc[0]
+        self.assertEqual(june["observed_date"], pd.Timestamp("2020-06-20"))
+        self.assertFalse(bool(june["is_carried_forward"]))
+        self.assertNotIn(pd.Timestamp("2020-07-31"), zonisamide["date"].tolist())
+        august = zonisamide[zonisamide["date"].eq(pd.Timestamp("2020-08-31"))].iloc[0]
+        self.assertEqual(august["observed_date"], pd.Timestamp("2020-08-10"))
+
+        summaries = asm[asm["record_type"].eq("monthly_summary")].set_index("date")
+        self.assertEqual(int(summaries.loc[pd.Timestamp("2020-07-31"), "number_of_drugs"]), 0)
+        self.assertEqual(float(summaries.loc[pd.Timestamp("2020-07-31"), "total_ddd"]), 0.0)
+        self.assertFalse(
+            bool(summaries.loc[pd.Timestamp("2020-07-31"), "is_carried_forward"])
+        )
 
     def test_brain_image_sections_skip_notes_and_report_review_errors(self):
         doc = Document()
@@ -678,6 +856,7 @@ class ConsolidatedParserTests(unittest.TestCase):
         self.assertEqual(parser.unit_dose_from_label("Fycompa 2mg (Perampanel)"), (2.0, "mg"))
         self.assertEqual(parser.unit_dose_from_label("Valproate (Depakine)"), (500.0, "mg/tab"))
         self.assertEqual(parser.unit_dose_from_label("Lamictal 5mg/tab (Lamotrigine)"), (5.0, "mg/tab"))
+        self.assertEqual(parser.unit_dose_from_label("Gabapentin (Neurontin)"), (300.0, "mg/cap"))
 
     def test_mmse_q1_to_q11_values_are_parsed(self):
         doc = Document()
