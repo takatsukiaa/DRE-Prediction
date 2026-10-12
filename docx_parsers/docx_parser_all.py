@@ -1185,7 +1185,8 @@ def parse_labs(doc, path: Path, patient_id: str, cohort: str, errors: list[dict]
             continue
         for column in frame.columns:
             frame[column] = frame[column].map(clean_numeric_value)
-        frame = frame.resample("ME").mean().dropna(how="all")
+        # Keep each measurement's recorded date and value, including repeat tests.
+        frame = frame.dropna(how="all").sort_index(kind="stable")
         for date, source_values in frame.iterrows():
             for test_name, value in source_values.items():
                 if pd.notna(value):

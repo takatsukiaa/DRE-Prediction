@@ -18,6 +18,7 @@ import docx_parser_cognitive
 import docx_parser_eeg_timeline
 import docx_parser_seizure
 import docx_parser_static
+from structured_features import extract_structured_features
 
 
 DPI = 300
@@ -40,7 +41,14 @@ EEG_SLOW_COLOR = "gold"
 EEG_ED_COLOR = "limegreen"
 EEG_UNSPECIFIED_COLOR = "lightslategray"
 EEG_UNSPECIFIED_BURDEN_VALUE = 0.5
-EEG_UNSPECIFIED_RADIUS = 0.22
+EEG_UNSPECIFIED_RADIUS = 0.14
+
+# Use most of each heatmap cell so clinically meaningful differences are easy
+# to see.  A power greater than one avoids making small values look too similar
+# to large values (the previous square-root scaling did the opposite).
+CONTRAST_MIN_RADIUS = 0.09
+CONTRAST_MAX_RADIUS = 0.46
+CONTRAST_EXPONENT = 1.35
 
 ETIOLOGY_LIST = [
     "Hypoxia at birth",
@@ -267,28 +275,76 @@ def parse_month(value, label):
         return parsed.to_period("M")
 
 
-def apply_month_range(month_axis, start_month=None, end_month=None):
+def parse_month_count(value):
+    if value is None:
+        return None
+    text = str(value).strip()
+    if not text:
+        return None
+    try:
+        month_count = int(text)
+    except ValueError as exc:
+        raise ValueError("Months to plot must be a positive whole number.") from exc
+    if month_count < 1:
+        raise ValueError("Months to plot must be at least 1.")
+    return month_count
+
+
+def parse_month_direction(value):
+    if value is None:
+        return "first"
+    direction = str(value).strip().lower()
+    if direction not in {"first", "last"}:
+        raise ValueError("Month direction must be either 'first' or 'last'.")
+    return direction
+
+
+def apply_month_range(
+    month_axis,
+    start_month=None,
+    end_month=None,
+    months_to_plot=None,
+    month_direction="first",
+):
     start_period = parse_month(start_month, "Start month")
     end_period = parse_month(end_month, "End month")
+    month_count = parse_month_count(months_to_plot)
+    direction = parse_month_direction(month_direction)
     if start_period is not None and end_period is not None and start_period > end_period:
         raise ValueError("Start month cannot be after end month.")
 
-    first_month = month_axis.min()
-    last_month = month_axis.max()
-    if start_period is not None:
-        first_month = max(first_month, start_period)
-    if end_period is not None:
-        last_month = min(last_month, end_period)
+    # Explicit bounds define the requested observation window even when the
+    # ASM table has no entry in an early/late month. This is required for
+    # patient-specific clinical anchors such as the first Dr. Wu visit; the
+    # matrix builders will represent months without observations as zero.
+    first_month = start_period if start_period is not None else month_axis.min()
+    last_month = end_period if end_period is not None else month_axis.max()
     if first_month > last_month:
-        raise ValueError(
-            "Selected date range does not overlap the ASM timeline "
-            f"({month_axis.min().strftime('%Y-%m')} to {month_axis.max().strftime('%Y-%m')})."
-        )
-    return pd.period_range(first_month, last_month, freq="M")
+        raise ValueError("Selected start month cannot be after the selected end month.")
+    selected_months = pd.period_range(first_month, last_month, freq="M")
+    if month_count is not None and len(selected_months) > month_count:
+        if direction == "first":
+            selected_months = selected_months[:month_count]
+        else:
+            selected_months = selected_months[-month_count:]
+    return selected_months
 
 
 def month_columns(month_axis):
     return [month.strftime("%Y-%m") for month in month_axis]
+
+
+def has_dated_observation(df, month_axis, date_columns=()):
+    if df is None or df.empty:
+        return False
+    date_source = next(
+        (df[column] for column in date_columns if column in df.columns),
+        df.index,
+    )
+    dates = pd.to_datetime(pd.Series(date_source), errors="coerce").dropna()
+    if dates.empty:
+        return False
+    return bool(dates.dt.to_period("M").isin(month_axis).any())
 
 
 def dataframe_to_monthly_matrix(df, month_axis, rows=None, aggregation="max"):
@@ -489,12 +545,21 @@ def generic_radius(value, cap):
     return 0.12 + 0.28 * np.sqrt(scaled)
 
 
+def contrast_radius(value, cap):
+    if pd.isna(value) or value <= 0:
+        return 0
+    cap = max(float(cap), 1e-12)
+    scaled = min(float(value), cap) / cap
+    return CONTRAST_MIN_RADIUS + (CONTRAST_MAX_RADIUS - CONTRAST_MIN_RADIUS) * (
+        scaled ** CONTRAST_EXPONENT
+    )
+
+
 def cognitive_radius(feature, value):
     if pd.isna(value) or value <= 0:
         return 0
     maximum = COGNITIVE_MAX_SCORES.get(feature, 100)
-    scaled = min(float(value), maximum) / maximum
-    return 0.12 + 0.28 * np.sqrt(scaled)
+    return contrast_radius(value, maximum)
 
 
 def asm_radius(feature, value):
@@ -515,6 +580,17 @@ def tick_step(n_cols):
     return 12
 
 
+def responsive_cell_fontsize(fig_width, fig_height, n_rows, n_cols):
+    """Scale circle labels with the physical size of a rendered heatmap cell."""
+    plot_width = max(fig_width - 2.8, 1.0)
+    plot_height = max(fig_height - 1.8, 1.0)
+    cell_inches = min(
+        plot_width / max(n_cols, 1),
+        plot_height / max(n_rows, 1),
+    )
+    return float(np.clip(cell_inches * 34.0, 8.0, 18.0))
+
+
 def draw_heatmap(
     matrix,
     output_path,
@@ -522,12 +598,18 @@ def draw_heatmap(
     color_for_cell,
     radius_for_cell=None,
     row_label_formatter=None,
+    label_scale=1.0,
     dpi=DPI,
 ):
     n_rows, n_cols = matrix.shape
     fig_width = max(12.0, min(72.0, 2.8 + n_cols * 0.18))
     fig_height = max(2.8, min(48.0, 1.8 + max(n_rows, 1) * 0.42))
     fig, ax = plt.subplots(figsize=(fig_width, fig_height), dpi=dpi)
+    # Keep numeric values responsive to cell size so dense monthly rows do not
+    # overlap, while the axis labels below can be enlarged for publication.
+    cell_fontsize = responsive_cell_fontsize(
+        fig_width, fig_height, n_rows, n_cols
+    )
 
     ax.vlines(np.arange(n_cols + 1), 0, n_rows, color="#d9d9d9", linewidth=0.6, zorder=0)
     ax.hlines(np.arange(n_rows + 1), 0, n_cols, color="#bdbdbd", linewidth=0.75, zorder=0)
@@ -548,22 +630,36 @@ def draw_heatmap(
                 zorder=2,
             )
             ax.add_patch(circle)
-            ax.text(cx, cy, format_value(value), ha="center", va="center", fontsize=5, color="black", zorder=3)
+            ax.text(
+                cx,
+                cy,
+                format_value(value),
+                ha="center",
+                va="center",
+                fontsize=cell_fontsize,
+                color="black",
+                zorder=3,
+            )
 
     ax.set_xlim(0, n_cols)
     ax.set_ylim(n_rows, 0)
     ax.set_aspect("equal")
-    ax.set_title(title, fontsize=18, pad=12)
+    ax.set_title(title, fontsize=22, pad=14)
 
     labels = [row_label_formatter(row) if row_label_formatter else row for row in matrix.index]
     ax.set_yticks(np.arange(n_rows) + 0.5)
-    ax.set_yticklabels(labels, fontsize=8)
+    ax.set_yticklabels(labels, fontsize=round(11 * label_scale))
 
     step = tick_step(n_cols)
     tick_positions = np.arange(0, n_cols, step) + 0.5
     tick_labels = [matrix.columns[idx] for idx in range(0, n_cols, step)]
     ax.set_xticks(tick_positions)
-    ax.set_xticklabels(tick_labels, rotation=45, ha="right", fontsize=7)
+    ax.set_xticklabels(
+        tick_labels,
+        rotation=45,
+        ha="right",
+        fontsize=round(10 * label_scale),
+    )
     ax.tick_params(axis="both", length=0)
 
     for spine in ax.spines.values():
@@ -587,23 +683,46 @@ def eeg_burden_label(value):
     return "C"
 
 
-def draw_eeg_burden_circle(ax, row_idx, col_idx, value, color):
+def eeg_burden_radius(value):
+    """Map the ordinal EEG burden levels to clearly separated bubble sizes."""
+    numeric_value = float(value)
+    if numeric_value <= EEG_UNSPECIFIED_BURDEN_VALUE:
+        return EEG_UNSPECIFIED_RADIUS
+    if numeric_value <= 1:
+        return 0.20
+    if numeric_value <= 2:
+        return 0.32
+    if numeric_value <= 3:
+        return 0.43
+    return 0.48
+
+
+def draw_eeg_burden_circle(ax, row_idx, col_idx, value, color, fontsize=6):
     if pd.isna(value) or value <= 0:
         return
     cx = col_idx + 0.5
     cy = row_idx + 0.5
     numeric_value = float(value)
     if numeric_value <= EEG_UNSPECIFIED_BURDEN_VALUE:
-        radius = EEG_UNSPECIFIED_RADIUS
         color = EEG_UNSPECIFIED_COLOR
-    else:
-        radius = 0.12 + 0.25 * (numeric_value / 3)
+    radius = eeg_burden_radius(numeric_value)
     circle = patches.Circle((cx, cy), radius=radius, color=color, alpha=0.85, zorder=2)
     ax.add_patch(circle)
-    ax.text(cx, cy, eeg_burden_label(numeric_value), ha="center", va="center", fontsize=5, color="black", zorder=3)
+    ax.text(
+        cx,
+        cy,
+        eeg_burden_label(numeric_value),
+        ha="center",
+        va="center",
+        fontsize=fontsize,
+        color="black",
+        zorder=3,
+    )
 
 
-def draw_eeg_lr_proportion(ax, row_idx, col_idx, left_value, right_value, color):
+def draw_eeg_lr_proportion(
+    ax, row_idx, col_idx, left_value, right_value, color, fontsize=8
+):
     total = float(left_value) + float(right_value)
     if total <= 0:
         return
@@ -620,7 +739,7 @@ def draw_eeg_lr_proportion(ax, row_idx, col_idx, left_value, right_value, color)
             "L",
             ha="center",
             va="center",
-            fontsize=5,
+            fontsize=fontsize,
             color="black",
             zorder=3,
         )
@@ -647,7 +766,7 @@ def draw_eeg_lr_proportion(ax, row_idx, col_idx, left_value, right_value, color)
             "R",
             ha="center",
             va="center",
-            fontsize=5,
+            fontsize=fontsize,
             color="black",
             zorder=3,
         )
@@ -663,6 +782,7 @@ def draw_eeg_heatmap(matrix, output_path, title, dpi=DPI):
     fig_width = max(12.0, min(72.0, 2.8 + n_cols * 0.18))
     fig_height = max(5.0, min(48.0, 1.8 + n_rows * 0.42))
     fig, ax = plt.subplots(figsize=(fig_width, fig_height), dpi=dpi)
+    cell_fontsize = responsive_cell_fontsize(fig_width, fig_height, n_rows, n_cols)
 
     ax.vlines(np.arange(n_cols + 1), 0, n_rows, color="#d9d9d9", linewidth=0.6, zorder=0)
     ax.hlines(np.arange(n_rows + 1), 0, n_cols, color="#bdbdbd", linewidth=0.75, zorder=0)
@@ -682,6 +802,7 @@ def draw_eeg_heatmap(matrix, output_path, title, dpi=DPI):
                     matrix.loc[left_column, column],
                     matrix.loc[right_column, column],
                     EEG_SLOW_COLOR,
+                    fontsize=cell_fontsize,
                 )
             elif feature in ed_region_map:
                 left_column, right_column = ed_region_map[feature]
@@ -692,24 +813,29 @@ def draw_eeg_heatmap(matrix, output_path, title, dpi=DPI):
                     matrix.loc[left_column, column],
                     matrix.loc[right_column, column],
                     EEG_ED_COLOR,
+                    fontsize=cell_fontsize,
                 )
             elif feature in EEG_GLOBAL_SLOW_ROWS:
-                draw_eeg_burden_circle(ax, row_idx, col_idx, value, EEG_SLOW_COLOR)
+                draw_eeg_burden_circle(
+                    ax, row_idx, col_idx, value, EEG_SLOW_COLOR, fontsize=cell_fontsize
+                )
             elif feature in EEG_GLOBAL_ED_ROWS:
-                draw_eeg_burden_circle(ax, row_idx, col_idx, value, EEG_ED_COLOR)
+                draw_eeg_burden_circle(
+                    ax, row_idx, col_idx, value, EEG_ED_COLOR, fontsize=cell_fontsize
+                )
 
     ax.set_xlim(0, n_cols)
     ax.set_ylim(n_rows, 0)
     ax.set_aspect("equal")
-    ax.set_title(title, fontsize=18, pad=12)
+    ax.set_title(title, fontsize=22, pad=14)
     ax.set_yticks(np.arange(n_rows) + 0.5)
-    ax.set_yticklabels(display_rows, fontsize=8)
+    ax.set_yticklabels(display_rows, fontsize=11)
 
     step = tick_step(n_cols)
     tick_positions = np.arange(0, n_cols, step) + 0.5
     tick_labels = [matrix.columns[idx] for idx in range(0, n_cols, step)]
     ax.set_xticks(tick_positions)
-    ax.set_xticklabels(tick_labels, rotation=45, ha="right", fontsize=7)
+    ax.set_xticklabels(tick_labels, rotation=45, ha="right", fontsize=10)
     ax.tick_params(axis="both", length=0)
 
     for spine in ax.spines.values():
@@ -920,13 +1046,13 @@ def plot_static_data(static_data, output_path, title="Static Data", dpi=DPI):
     plt.close(fig)
 
 
-def save_category_plots(stem, output_dir, matrices):
+def save_category_plots(stem, output_dir, matrices, include_static=True):
     asm_matrix = matrices["asm"]
     seizure_matrix = matrices["seizure"]
     eeg_matrix = matrices["eeg"]
     lab_matrix = matrices["lab"]
     cognitive_matrix, cognitive_flagged = matrices["cognitive"]
-    static_data = matrices["static"]
+    static_data = matrices.get("static", {})
 
     outputs = {}
     outputs["asm"] = output_dir / f"{stem}_asm_heatmap.png"
@@ -936,14 +1062,23 @@ def save_category_plots(stem, output_dir, matrices):
         "ASM Timeline (DDD Units)",
         lambda _feature, _value, _row, _col: ASM_COLOR,
         radius_for_cell=lambda feature, value, _cap: asm_radius(feature, value),
+        label_scale=1.4,
     )
 
     outputs["seizure"] = output_dir / f"{stem}_seizure_heatmap.png"
+    seizure_caps = {
+        feature: value_cap(seizure_matrix.loc[[feature]])
+        for feature in seizure_matrix.index
+    }
     draw_heatmap(
         seizure_matrix,
         outputs["seizure"],
         "Seizure",
         lambda _feature, _value, _row, _col: SEIZURE_COLOR,
+        radius_for_cell=lambda feature, value, _cap: contrast_radius(
+            value, seizure_caps[feature]
+        ),
+        label_scale=1.8,
     )
 
     outputs["eeg"] = output_dir / f"{stem}_eeg_heatmap.png"
@@ -969,17 +1104,34 @@ def save_category_plots(stem, output_dir, matrices):
         row_label_formatter=lambda row: str(row).replace("_", " "),
     )
 
-    outputs["static"] = output_dir / f"{stem}_static_data.png"
-    plot_static_data(static_data, outputs["static"], title=f"{stem} Static Data")
+    if include_static:
+        outputs["static"] = output_dir / f"{stem}_static_data.png"
+        plot_static_data(static_data, outputs["static"], title=f"{stem} Static Data")
 
     return outputs
 
 
-def build_patient_matrices(docx_path, start_month=None, end_month=None):
+def build_patient_matrices(
+    docx_path,
+    start_month=None,
+    end_month=None,
+    months_to_plot=None,
+    month_direction="first",
+    include_static=True,
+):
     errors = []
     asm_df = docx_parser_asm.extract_asm_timeline_from_docx(str(docx_path))
-    month_axis = apply_month_range(make_month_axis(asm_df), start_month=start_month, end_month=end_month)
+    month_axis = apply_month_range(
+        make_month_axis(asm_df),
+        start_month=start_month,
+        end_month=end_month,
+        months_to_plot=months_to_plot,
+        month_direction=month_direction,
+    )
     matrices = {"asm": build_asm_matrix(asm_df, month_axis)}
+    presence = {
+        "asm": has_dated_observation(asm_df, month_axis),
+    }
 
     try:
         seizure_df = docx_parser_seizure.extract_seizure_timeline(str(docx_path))
@@ -987,6 +1139,7 @@ def build_patient_matrices(docx_path, start_month=None, end_month=None):
         seizure_df = None
         errors.append(("seizure", str(exc)))
     matrices["seizure"] = build_seizure_matrix(seizure_df, month_axis)
+    presence["seizure"] = has_dated_observation(seizure_df, month_axis, ("month",))
 
     try:
         eeg_df = docx_parser_eeg_timeline.table_selection(str(docx_path))
@@ -994,6 +1147,7 @@ def build_patient_matrices(docx_path, start_month=None, end_month=None):
         eeg_df = None
         errors.append(("eeg", str(exc)))
     matrices["eeg"] = build_eeg_matrix(eeg_df, month_axis)
+    presence["eeg"] = has_dated_observation(eeg_df, month_axis, ("month", "report_date"))
 
     try:
         lab_result = docx_parser_blood_test.extract_lab_timeline_from_docx(str(docx_path))
@@ -1001,6 +1155,10 @@ def build_patient_matrices(docx_path, start_month=None, end_month=None):
         lab_result = None
         errors.append(("lab", str(exc)))
     matrices["lab"] = build_lab_matrix(lab_result, month_axis)
+    presence["lab"] = bool(
+        lab_result
+        and any(has_dated_observation(frame, month_axis) for frame in lab_result)
+    )
 
     try:
         cognitive_df = docx_parser_cognitive.extract_cognitive_timeline_from_docx(str(docx_path))
@@ -1008,38 +1166,70 @@ def build_patient_matrices(docx_path, start_month=None, end_month=None):
         cognitive_df = None
         errors.append(("cognitive", str(exc)))
     matrices["cognitive"] = build_cognitive_matrices(cognitive_df, month_axis)
+    presence["cognitive"] = has_dated_observation(cognitive_df, month_axis)
+    matrices["_presence"] = presence
 
-    try:
-        static_data = docx_parser_static.extract_static_data_from_docx(str(docx_path))
-    except Exception as exc:
-        static_data = {}
-        errors.append(("static", str(exc)))
-    matrices["static"] = static_data
+    if include_static:
+        try:
+            static_data = docx_parser_static.extract_static_data_from_docx(str(docx_path))
+        except Exception as exc:
+            static_data = {}
+            errors.append(("static", str(exc)))
+        matrices["static"] = static_data
 
     return month_axis, matrices, errors
 
 
-def process_patient(docx_path, output_root, start_month=None, end_month=None):
+def process_patient(
+    docx_path,
+    output_root,
+    start_month=None,
+    end_month=None,
+    months_to_plot=None,
+    month_direction="first",
+    output_stem=None,
+    include_static=True,
+):
     docx_path = Path(docx_path)
-    patient_dir = Path(output_root) / docx_path.stem
+    output_stem = str(output_stem or docx_path.stem)
+    patient_dir = Path(output_root) / output_stem
     patient_dir.mkdir(parents=True, exist_ok=True)
 
     month_axis, matrices, errors = build_patient_matrices(
         docx_path,
         start_month=start_month,
         end_month=end_month,
+        months_to_plot=months_to_plot,
+        month_direction=month_direction,
+        include_static=include_static,
     )
-    outputs = save_category_plots(docx_path.stem, patient_dir, matrices)
+    outputs = save_category_plots(
+        output_stem,
+        patient_dir,
+        matrices,
+        include_static=include_static,
+    )
+    structured = extract_structured_features(matrices, lab_is_abnormal)
     return {
         "docx": str(docx_path),
         "output_dir": str(patient_dir),
         "months": len(month_axis),
+        "start_month": month_axis.min().strftime("%Y-%m"),
+        "end_month": month_axis.max().strftime("%Y-%m"),
         "outputs": outputs,
         "errors": errors,
+        "structured_features": structured,
     }
 
 
-def process_inputs(paths, output_dir, start_month=None, end_month=None):
+def process_inputs(
+    paths,
+    output_dir,
+    start_month=None,
+    end_month=None,
+    months_to_plot=None,
+    month_direction="first",
+):
     files = collect_docx_files(paths)
     if not files:
         safe_print("No DOCX files found.")
@@ -1055,6 +1245,8 @@ def process_inputs(paths, output_dir, start_month=None, end_month=None):
                 output_dir,
                 start_month=start_month,
                 end_month=end_month,
+                months_to_plot=months_to_plot,
+                month_direction=month_direction,
             )
         except Exception as exc:
             skipped.append((docx_path.name, str(exc)))
@@ -1098,6 +1290,33 @@ def ask_month_range(root):
             messagebox.showerror("Invalid date range", str(exc), parent=root)
 
 
+def ask_month_count(root):
+    while True:
+        value = simpledialog.askstring(
+            "Months to plot",
+            "Enter the number of months to plot.\n"
+            "Leave blank or Cancel to plot every available month.",
+            parent=root,
+        )
+        try:
+            return parse_month_count(value)
+        except ValueError as exc:
+            messagebox.showerror("Invalid month count", str(exc), parent=root)
+
+
+def ask_month_direction(root, month_count):
+    if month_count is None:
+        return "first"
+    plot_first = messagebox.askyesno(
+        "Choose month direction",
+        f"Which {month_count} months should be plotted?\n\n"
+        f"Yes: first {month_count} months\n"
+        f"No: last {month_count} months",
+        parent=root,
+    )
+    return "first" if plot_first else "last"
+
+
 def choose_gui_inputs():
     root = Tk()
     root.withdraw()
@@ -1109,16 +1328,18 @@ def choose_gui_inputs():
     )
     if not files:
         root.destroy()
-        return [], "", None, None
+        return [], "", None, None, None, "first"
 
     output_dir = askdirectory(title="Select Output Folder for Patient Heatmaps")
     if not output_dir:
         root.destroy()
-        return list(files), "", None, None
+        return list(files), "", None, None, None, "first"
 
     start_month, end_month = ask_month_range(root)
+    months_to_plot = ask_month_count(root)
+    month_direction = ask_month_direction(root, months_to_plot)
     root.destroy()
-    return list(files), output_dir, start_month, end_month
+    return list(files), output_dir, start_month, end_month, months_to_plot, month_direction
 
 
 def main():
@@ -1149,15 +1370,41 @@ def main():
         default=None,
         help="Optional last month to plot, for example 2024-12. Defaults to each patient's latest ASM month.",
     )
+    parser.add_argument(
+        "--months-to-plot",
+        default=None,
+        help=(
+            "Optional number of months to plot. If a patient has fewer months, "
+            "all available months are plotted."
+        ),
+    )
+    parser.add_argument(
+        "--month-direction",
+        choices=("first", "last"),
+        default="first",
+        help=(
+            "Choose whether --months-to-plot keeps the first or last months "
+            "in the selected range. Defaults to first."
+        ),
+    )
     args = parser.parse_args()
 
     paths = args.paths
     output_dir = args.output_dir
     start_month = args.start_month
     end_month = args.end_month
+    months_to_plot = args.months_to_plot
+    month_direction = args.month_direction
 
     if not paths:
-        paths, output_dir, start_month, end_month = choose_gui_inputs()
+        (
+            paths,
+            output_dir,
+            start_month,
+            end_month,
+            months_to_plot,
+            month_direction,
+        ) = choose_gui_inputs()
         if not paths:
             safe_print("No DOCX files selected.")
             return
@@ -1171,6 +1418,8 @@ def main():
     try:
         parse_month(start_month, "Start month")
         parse_month(end_month, "End month")
+        months_to_plot = parse_month_count(months_to_plot)
+        month_direction = parse_month_direction(month_direction)
         if parse_month(start_month, "Start month") and parse_month(end_month, "End month"):
             if parse_month(start_month, "Start month") > parse_month(end_month, "End month"):
                 raise ValueError("Start month cannot be after end month.")
@@ -1178,7 +1427,14 @@ def main():
         safe_print(f"Invalid date range: {exc}")
         return
 
-    process_inputs(paths, output_dir, start_month=start_month, end_month=end_month)
+    process_inputs(
+        paths,
+        output_dir,
+        start_month=start_month,
+        end_month=end_month,
+        months_to_plot=months_to_plot,
+        month_direction=month_direction,
+    )
 
 
 if __name__ == "__main__":

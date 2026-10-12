@@ -24,3 +24,7 @@ __pycache__/
 *.docx
 /new_csvs
 /mysql_ready_csvs
+*.pt
+excel_oldfiles
+# Local migration snapshots, logs, and destination setup
+/local_sync/

@@ -387,7 +387,6 @@ while True:
             "Seizure": [
                 "Seizure",
                 "Seizures in the past 1 year",
-                ">= 3 ASMs",
             ],
 
             "Slow-Wave and ED": [
