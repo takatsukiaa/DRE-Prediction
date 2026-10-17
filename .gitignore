@@ -28,3 +28,12 @@ __pycache__/
 excel_oldfiles
 # Local migration snapshots, logs, and destination setup
 /local_sync/
+
+# Complete local SQL extracts for feature engineering
+/value based model/data/sql_snapshots/
+
+# Patient-level derived feature bundles and assignments
+/value based model/data/features/
+
+# Fitted forests, patient risk predictions, and evaluation artifacts
+/value based model/results/
