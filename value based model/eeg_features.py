@@ -123,8 +123,8 @@ def build_eeg_index(records, patient_ids, as_of, progress=None):
     return indexed, dict(counts), audits
 
 
-@lru_cache(maxsize=1)
-def feature_dictionary():
+@lru_cache(maxsize=3)
+def feature_dictionary(history_months=12):
     result = {}
     definitions = {
         'latest_score': 'Existing ordinal encoder value at the latest available EEG date; unmentioned is missing',
@@ -133,6 +133,10 @@ def feature_dictionary():
         'max_score_6m': 'Maximum observed ordinal score in the prior 6 months; missing if never assessable',
         'max_score_12m': 'Maximum observed ordinal score in the prior 12 months; missing if never assessable',
     }
+    definitions = {key: value.replace('12 months', f'{history_months} months')
+                   for key, value in definitions.items() if not key.startswith('max_score_')}
+    for months in sorted({min(6, history_months), history_months}):
+        definitions[f'max_score_{months}m'] = f'Maximum observed ordinal score in the prior {months} months; missing if never assessable'
     for feature in encoder.EEG_FEATURES:
         for suffix, definition in definitions.items():
             result[f'eeg__{feature_slug(feature)}__{suffix}'] = dict(source='dbo.EegRecords.Note',
@@ -148,7 +152,8 @@ def feature_dictionary():
         'eeg_ed_newly_detected': 'Previous ED indicator 0 and latest 1; both within history and assessable',
         'eeg_ed_no_longer_detected': 'Previous ED indicator 1 and latest 0; both within history and assessable',
     }
-    for months in (6, 12):
+    flags = {key: value.replace('12 months', f'{history_months} months') for key, value in flags.items()}
+    for months in sorted({min(6, history_months), history_months}):
         flags.update({f'eeg_encoded_dates_{months}m': 'Distinct available EEG report dates within this window',
             f'eeg_assessable_dates_{months}m': 'Report dates with at least one assessable encoded score',
             f'eeg_ed_positive_fraction_{months}m': 'Fraction among dates with known ED indicator; missing if none assessable',
@@ -177,16 +182,18 @@ def _same_date(rows):
                 review_required=float(conflict or any(r['review_required'] for r in rows)))
 
 
-def history_features(reports, prediction):
-    lower = _add_months(prediction, -12)
+def history_features(reports, prediction, history_months=12, *, lower=None, end=None):
+    lower = _add_months(prediction, -history_months) if lower is None else lower
+    end = prediction if end is None else end
     by_date = defaultdict(list)
     for report in reports:
-        if lower <= report['date'] < prediction and report['available'] < prediction:
+        if lower <= report['date'] < end and report['available'] < end:
             by_date[report['date']].append(report)
     history = [_same_date(group) for _, group in sorted(by_date.items())]
-    result = dict.fromkeys(feature_dictionary())
-    for months in (6, 12):
-        group = [row for row in history if row['date'] >= _add_months(prediction, -months)]
+    result = dict.fromkeys(feature_dictionary(history_months))
+    for months in sorted({min(6, history_months), history_months}):
+        start = lower if months == history_months else _add_months(end, -months)
+        group = [row for row in history if row['date'] >= start]
         result[f'eeg_encoded_dates_{months}m'] = len(group)
         result[f'eeg_assessable_dates_{months}m'] = sum(any(v is not None for v in r['scores'].values()) for r in group)
         for field, output in [('ed_present', 'ed'), ('slow_present', 'slow')]:

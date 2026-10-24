@@ -8,29 +8,7 @@ import pandas as pd
 
 from longitudinal_features import (build_features, medication_difference, medication_snapshot,
                                    number, numeric_history, seizure_window)
-from train import make_patient_split
-
-
-def drug(name, dose=100, record=1, **extra):
-    return dict(Id=record * 10, AsmRecordViewModelId=record, DrugName=name,
-                DailyDose=dose, Quantity=1, Frequency='BID', WhoDddValue=100, **extra)
-
-
-def fixture():
-    return {
-        'dbo.Patients': pd.DataFrame([dict(PatientId='0001', Birthday='1980-01-01', Gender='Male'),
-                                      dict(PatientId='0002', Birthday='1990-01-01', Gender='Female')]),
-        'dbo.AsmRecords': pd.DataFrame([dict(Id=i, Date=date, PatientBaselineViewModelPatientId='0001')
-                                       for i, date in enumerate(['2019-11-01', '2019-12-01', '2020-01-15'], 1)]),
-        'dbo.AsmDrugDetail': pd.DataFrame([drug('Lamotrigine', record=1), drug('Valproate', record=1),
-            drug('Lamotrigine', dose=200, record=2), drug('Levetiracetam', record=2),
-            drug('Carbamazepine', dose=900, record=3)]),
-        'dbo.PatientMonthlyDreStatus': pd.DataFrame([
-            dict(PatientId='0001', MonthStart='2019-12-01', AssessmentDate='2019-12-31', IsDRE=1),
-            dict(PatientId='0001', MonthStart='2020-01-01', AssessmentDate='2020-01-31', IsDRE=0),
-            dict(PatientId='0001', MonthStart='2020-07-01', AssessmentDate='2020-07-31', IsDRE=0),
-            dict(PatientId='0001', MonthStart='2021-01-01', AssessmentDate='2021-01-31', IsDRE=None)]),
-    }
+from tests.helpers import drug, fixture
 
 
 class FeatureTests(unittest.TestCase):
@@ -58,18 +36,15 @@ class FeatureTests(unittest.TestCase):
         pd.testing.assert_frame_equal(before, after)
         self.assertEqual(before.iloc[-1]['asm__carbamazepine_present'], 0)
 
-    def test_future_labels_are_not_features_and_both_states_are_retained(self):
+    def test_future_labels_do_not_change_historical_features(self):
         tables = fixture()
         before, visits, _, _ = self.build(tables)
         self.assertEqual(visits.iloc[-1].current_dre, 1)
-        self.assertEqual(visits.iloc[-1].target_dre_6m, 0)
-        self.assertTrue(pd.isna(visits.iloc[-1].target_dre_12m))
-        self.assertEqual(visits.iloc[-1].outcome_reason_12m, 'unknown_label')
-        tables['dbo.PatientMonthlyDreStatus'].loc[lambda r: r.MonthStart.eq('2020-07-01'), 'IsDRE'] = 1
+        self.assertFalse(any(c.startswith(("target_", "outcome_", "sample_weight_")) for c in visits))
+        tables["dbo.PatientMonthlyDreStatus"].loc[lambda r: r.MonthStart.eq("2020-01-01"), "IsDRE"] = 1
         after, changed, _, _ = self.build(tables)
         pd.testing.assert_frame_equal(before, after)
-        self.assertEqual(changed.iloc[-1].target_dre_6m, 1)
-        self.assertEqual(visits.iloc[-1].target_date_6m, dt.date(2020, 7, 31))
+        pd.testing.assert_frame_equal(visits, changed)
 
     def test_unknown_latest_month_does_not_backfill_previous_positive(self):
         tables = fixture()
@@ -165,15 +140,6 @@ class FeatureTests(unittest.TestCase):
         self.assertGreater(values['known_days'], 0)
         missing = seizure_window([], dt.date(2020, 1, 15), dt.date(2019, 1, 15), dt.date(2020, 1, 14))
         self.assertIsNone(missing['count_lower_bound'])
-
-    def test_split_uses_unique_patient_ids_and_is_reproducible(self):
-        ids = [f'{i:04}' for i in range(265)]
-        labels = pd.DataFrame({'PatientId': ids, 'IsDRE': [int(i % 3 == 0) for i in range(265)]})
-        split = make_patient_split(ids, labels)
-        self.assertEqual(len(split['train']), 132)
-        self.assertEqual(len(split['test']), 133)
-        self.assertFalse(set(split['train']) & set(split['test']))
-        self.assertEqual(split, make_patient_split(ids, labels))
 
     def test_confirmed_gender_default_and_explicit_unknown_legend(self):
         tables = fixture()

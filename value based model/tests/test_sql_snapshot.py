@@ -1,42 +1,12 @@
 """Snapshot serialization and schema checks; no database connection required."""
-import datetime as dt
-import json
-import tempfile
 import unittest
-from decimal import Decimal
 from pathlib import Path
 
 import pandas as pd
 
-from sql_snapshot import (DatabaseSnapshot, _projection, _typed_frame,
+from sql_snapshot import (_projection, _typed_frame,
                           make_inventory, quote_identifier, read_snapshot, write_snapshot)
-
-
-def column(table,name,kind,ordinal=1):
-    return dict(SchemaName="dbo",TableName=table,ColumnName=name,SqlType=kind,Ordinal=ordinal)
-
-
-def local_temp_directory():
-    # Verify the actual cleanup target is inside the workspace before the
-    # TemporaryDirectory context can recursively remove its own test files.
-    root=Path(__file__).resolve().parent
-    directory=tempfile.TemporaryDirectory(prefix=".snapshot-test-",dir=root)
-    if not Path(directory.name).resolve().is_relative_to(root):
-        raise ValueError("Test temporary directory escaped the workspace")
-    return directory
-
-
-def example_snapshot():
-    columns=[column("Patients","PatientId","nvarchar"),column("Patients","IsDRE","bit",2),
-             column("Patients","Timestamp","datetimeoffset",3),column("Patients","ExactValue","decimal",4),
-             column("Patients","BinaryValue","varbinary",5),column("Empty","Id","bigint")]
-    schema=dict(format_version=1,database="EpilepsyDB",server="test",extracted_at_utc="2026-10-16T00:00:00+00:00",
-                tables=[dict(SchemaName="dbo",TableName="Patients"),dict(SchemaName="dbo",TableName="Empty")],
-                columns=columns,primary_keys=[dict(SchemaName="dbo",TableName="Patients",ColumnName="PatientId")],foreign_keys=[])
-    records=[dict(PatientId="0001",IsDRE=None,Timestamp="5017-04-13T10:20:30.1234567+08:00",ExactValue=Decimal("123.456789123456789"),BinaryValue=b"\x00\xff"),
-             dict(PatientId="0002",IsDRE=False,Timestamp=None,ExactValue=None,BinaryValue=None)]
-    tables={"dbo.Patients":_typed_frame(records,columns[:5]),"dbo.Empty":_typed_frame([],columns[5:])}
-    return DatabaseSnapshot(tables,schema,make_inventory(tables,schema))
+from tests.helpers import column, example_snapshot, local_temp_directory
 
 
 class SqlSnapshotTests(unittest.TestCase):

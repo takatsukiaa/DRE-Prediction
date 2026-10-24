@@ -7,7 +7,7 @@ import pandas as pd
 
 from eeg_features import build_eeg_index, encode_report, feature_dictionary, history_features
 from longitudinal_features import build_features
-from tests.test_longitudinal_features import fixture
+from tests.helpers import fixture
 
 
 NORMAL = 'EEG diagnosis: Normal. Description: Vertex sharp waves and sleep spindles during sleep.'
@@ -104,7 +104,8 @@ class EegFeatureTests(unittest.TestCase):
         features, visits, dictionary, audit = build_features(tables, dt.date(2021, 2, 1))
         self.assertEqual(features.iloc[-1]['eeg__spike_ed__latest_score'], 3)
         self.assertEqual(features.iloc[-1]['eeg_dates_12m'], 1)
-        self.assertEqual(visits.iloc[-1].target_dre_6m, 0)
+        self.assertFalse(any(c.startswith('target_') for c in features))
+        self.assertFalse(any(c.startswith('target_') for c in visits))
         self.assertTrue(all(dtype == np.dtype('float32') for dtype in features.dtypes))
         self.assertTrue(set(feature_dictionary()).issubset(dictionary))
         self.assertEqual(audit['eeg_encoding']['encoded_segments'], 1)

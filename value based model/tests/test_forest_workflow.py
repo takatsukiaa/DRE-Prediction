@@ -7,7 +7,7 @@ import pandas as pd
 
 from forest_workflow import (FOREST_DEFAULTS, TrainingFeatureFilter, change_feature,
     compare_brier, core_feature, fit_forest, patient_weights, performance, source_importance)
-from tests.test_sql_snapshot import local_temp_directory
+from tests.helpers import local_temp_directory
 
 
 class ForestWorkflowTests(unittest.TestCase):
@@ -34,16 +34,16 @@ class ForestWorkflowTests(unittest.TestCase):
         X = pd.DataFrame(dict(signal=[0., 0., 10., np.nan, 0., 10.],
                               empty=[np.nan] * 6, constant=[8.] * 6))
         model = fit_forest(X, [0, 0, 1, 1, 0, 1], ['a', 'a', 'b', 'b', 'c', 'c'],
-            list(X), 0, 6, 'with_changes', dict(FOREST_DEFAULTS, n_estimators=8, min_samples_leaf=1, n_jobs=1))
+            list(X), 'with_changes', dict(FOREST_DEFAULTS, n_estimators=8, min_samples_leaf=1, n_jobs=1))
         self.assertEqual(model.pipeline.named_steps['imputer'].statistics_[0], 0)
         test = pd.DataFrame(dict(signal=[np.nan, 1e6], empty=[123., 456.], constant=[99., 100.]))
-        before = model.predict_switch_probability(test)
+        before = model.predict_probability(test)
         self.assertTrue(((before >= 0) & (before <= 1)).all())
         with local_temp_directory() as directory:
             file = Path(directory) / 'forest.joblib'
             joblib.dump(model, file)
             loaded = joblib.load(file)
-            np.testing.assert_array_equal(before, loaded.predict_switch_probability(test))
+            np.testing.assert_array_equal(before, loaded.predict_probability(test))
 
     def test_delta_waves_are_not_mistaken_for_change_features(self):
         self.assertFalse(change_feature('eeg__delta_waves__latest_score'))
@@ -78,7 +78,7 @@ class ForestWorkflowTests(unittest.TestCase):
         X = pd.DataFrame(dict(signal=[0., np.nan, 1., np.nan] * 10,
             empty=[np.nan] * 40, constant=[8.] * 40, other=[0., 1., 0., 1.] * 10))
         model = fit_forest(X, [0, 1, 0, 1] * 10, ['a'] * 20 + ['b'] * 20,
-            list(X), 0, 6, 'all_features', dict(FOREST_DEFAULTS, n_estimators=20, min_samples_leaf=1, n_jobs=1))
+            list(X), 'all_features', dict(FOREST_DEFAULTS, n_estimators=20, min_samples_leaf=1, n_jobs=1))
         ranking, selected = source_importance(model, list(X), 1)
         self.assertEqual(len(ranking), 4)
         self.assertEqual(len(selected), 1)

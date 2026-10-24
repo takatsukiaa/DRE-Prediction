@@ -37,3 +37,5 @@ excel_oldfiles
 
 # Fitted forests, patient risk predictions, and evaluation artifacts
 /value based model/results/
+
+outputs

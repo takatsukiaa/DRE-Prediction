@@ -10,16 +10,18 @@ MODEL_ROOT = Path(__file__).resolve().parents[1]
 if str(MODEL_ROOT) not in sys.path:
     sys.path.insert(0, str(MODEL_ROOT))
 
-from tools.sql_data_loader import connect_epilepsydb, load_database_snapshot, load_saved_snapshot
+from extract_sql import connect_epilepsydb
+from sql_snapshot import extract_snapshot, read_snapshot
 
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument("snapshot",type=Path)
+    parser.add_argument('--server', default=r'.\SQLEXPRESS')
     args=parser.parse_args()
-    saved=load_saved_snapshot(args.snapshot)
-    with connect_epilepsydb() as connection:
-        live=load_database_snapshot(connection)
+    saved=read_snapshot(args.snapshot)
+    with connect_epilepsydb(args.server) as connection:
+        live=extract_snapshot(connection)
     if set(saved.tables)!=set(live.tables):
         raise AssertionError("Saved tables differ from current database tables")
     for name,expected in live.tables.items():

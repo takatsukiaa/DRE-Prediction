@@ -1,7 +1,7 @@
 """Past-only feature calculations, using the existing audited medication rules.
 
-Prediction is before each medication visit. All comparisons are restricted to
-the preceding 12 calendar months. Missing is never silently converted to zero.
+History starts 12 calendar months before each medication visit and runs for
+3, 6, 9, or 12 months. Missing is never silently converted to zero.
 """
 from bisect import bisect_left
 from collections import Counter, defaultdict
@@ -24,6 +24,7 @@ from analyze_onset import ASM_NAMES, normalized, scheduled
 from monthly_dre import add_months, covered_days, medication_state, month_end, seizure_lower_bound
 
 FK = 'PatientBaselineViewModelPatientId'
+HISTORY_WINDOWS = (3, 6, 9, 12)
 LABS = {'biochem': ('BioChemRecords', 'BioChemItemSettings'),
         'hematology': ('HematologyRecords', 'HematologyItemSettings'),
         'immuno': ('ImmunoRecords', 'ImmunoItemSettings'),
@@ -152,9 +153,18 @@ def measurement_index(tables, patients, as_of, lookups, issues):
     return indexed
 
 
-def numeric_history(dates, values, prediction):
-    left, right = bisect_left(dates, add_months(prediction, -12)), bisect_left(dates, prediction)
-    result = {'observations_12m': sum(v is not None for v in values[left:right])}
+def history_bounds(prediction, history_months):
+    """Inclusive start and exclusive end, anchored to prediction minus 12 months."""
+    if history_months not in HISTORY_WINDOWS:
+        raise ValueError('history_months must be 3, 6, 9, or 12')
+    return add_months(prediction, -12), add_months(prediction, history_months - 12)
+
+
+def numeric_history(dates, values, prediction, history_months=12, *, lower=None, end=None):
+    lower = add_months(prediction, -history_months) if lower is None else lower
+    end = prediction if end is None else end
+    left, right = bisect_left(dates, lower), bisect_left(dates, end)
+    result = {f'observations_{history_months}m': sum(v is not None for v in values[left:right])}
     if right > left:
         result.update(latest=values[right - 1], age_days=(prediction - dates[right - 1]).days)
         if right - left >= 2:
@@ -225,7 +235,11 @@ def seizure_window(events, prediction, lower, upper):
         unknown_intervals=sum(e['SeizureCount'] is None for e in selected))
 
 
-def build_features(tables, as_of, progress=None, male_code='1', include_doses=True):
+def build_features(tables, as_of, progress=None, male_code='1', include_doses=True,
+                   history_months=12, include_status_history=True):
+    if history_months not in HISTORY_WINDOWS:
+        raise ValueError('history_months must be 3, 6, 9, or 12')
+    windows = sorted({min(6, history_months), history_months})
     issues, dictionary = Counter(), {}
     patients = {str(r['PatientId']): r for r in rows(tables, 'Patients')}
     if len(patients) != len(rows(tables, 'Patients')):
@@ -254,7 +268,7 @@ def build_features(tables, as_of, progress=None, male_code='1', include_doses=Tr
         for visit in group:
             visit['med'] = medication_snapshot(drugs[visit['id']])
             issues.update('medication: ' + s for s in visit['med']['flags'])
-    labels, target_lookup = defaultdict(list), {}
+    labels, seen_months = defaultdict(list), set()
     for record in rows(tables, 'PatientMonthlyDreStatus'):
         pid, start, date = str(record.get('PatientId')), day(record.get('MonthStart')), day(record.get('AssessmentDate'))
         if pid not in patients or start is None or start.day != 1 or date != month_end(start):
@@ -262,9 +276,9 @@ def build_features(tables, as_of, progress=None, male_code='1', include_doses=Tr
         status = int(record['IsDRE']) if isinstance(record.get('IsDRE'), bool) else number(record.get('IsDRE'))
         if record.get('IsDRE') is not None and status not in (0, 1):
             raise ValueError('Monthly label must be 0, 1, or unknown')
-        if (pid, date) in target_lookup:
+        if (pid, date) in seen_months:
             raise ValueError('Duplicate patient-month label')
-        target_lookup[(pid, date)] = status
+        seen_months.add((pid, date))
         if date <= as_of:
             labels[pid].append(dict(date=date, status=status))
         else:
@@ -303,10 +317,11 @@ def build_features(tables, as_of, progress=None, male_code='1', include_doses=Tr
             exams[pid][domain] = sorted(dates)
     for feature, spec in specs.items():
         for suffix, definition in NUMERIC_STATS.items():
-            dictionary[feature + '__' + suffix] = dict(**spec, definition=definition)
+            suffix = suffix.replace('12m', f'{history_months}m')
+            dictionary[feature + '__' + suffix] = dict(**spec, definition=definition.replace('12 months', f'{history_months} months'))
 
     eeg_index, eeg_summary, eeg_review = build_eeg_index(rows(tables, 'EegRecords'), patients, as_of, progress)
-    dictionary.update(eeg_dictionary())
+    dictionary.update(eeg_dictionary(history_months))
 
     chunks, metadata = [], []
     for patient_index, pid in enumerate(sorted(patients)):
@@ -317,7 +332,9 @@ def build_features(tables, as_of, progress=None, male_code='1', include_doses=Tr
         first_date = min(historical_dates) if historical_dates else None
         for i, visit in enumerate(group):
             prediction, row = visit['date'], {}
-            lower, recent = add_months(prediction, -12), add_months(prediction, -6)
+            lower, end = history_bounds(prediction, history_months)
+            window_starts = {m: (lower if m == history_months else add_months(end, -m)) for m in windows}
+            recent = window_starts[min(6, history_months)]
 
             def put(name, value, source, definition):
                 if name not in dictionary:
@@ -328,7 +345,7 @@ def build_features(tables, as_of, progress=None, male_code='1', include_doses=Tr
                     row[name] = float(value)
 
             def asm(name, value):
-                put(name, value, 'dbo.AsmRecords + dbo.AsmDrugDetail', 'Past-only medication level/change in 12-month history; unknown regimens and ambiguous doses remain missing')
+                put(name, value, 'dbo.AsmRecords + dbo.AsmDrugDetail', f'Past-only medication level/change in {history_months}-month history; unknown regimens and ambiguous doses remain missing')
 
             birthday = day(patients[pid].get('Birthday'))
             put('age_years', (prediction - birthday).days / 365.2425 if birthday and birthday <= prediction else None, 'dbo.Patients.Birthday', 'Age at prediction, not Age2026')
@@ -338,11 +355,12 @@ def build_features(tables, as_of, progress=None, male_code='1', include_doses=Tr
             if male_code is not None and gender in ('0', '1'):
                 sex_male = int(gender == str(male_code))
             put('sex_male', sex_male, 'dbo.Patients.Gender', 'Recognized immutable sex category; numeric codes require a confirmed legend')
-            put('history_days_available', max(0, (prediction - first_date).days) if first_date else None, 'dated source records', 'Days since earliest recorded observation, not complete coverage')
-            left = bisect_left(visit_dates, lower, 0, i)
-            history = group[left:i]
-            asm('asm_visits_12m', len(history))
-            asm('asm_visits_6m', i - bisect_left(visit_dates, recent, 0, i))
+            if include_status_history:
+                put('history_days_available', max(0, (prediction - first_date).days) if first_date else None, 'dated source records', 'Days since earliest recorded observation, not complete coverage')
+            left, stop = bisect_left(visit_dates, lower, 0, i), bisect_left(visit_dates, end, 0, i)
+            history = group[left:stop]
+            for months in windows:
+                asm(f'asm_visits_{months}m', stop - bisect_left(visit_dates, window_starts[months], 0, stop))
             asm('asm_pair_available', int(len(history) >= 2 and history[-1]['med']['complete'] and history[-2]['med']['complete']))
             latest = history[-1]['med'] if history else None
             previous = history[-2]['med'] if len(history) >= 2 else None
@@ -365,38 +383,41 @@ def build_features(tables, as_of, progress=None, male_code='1', include_doses=Tr
                 asm(base + '_daily_mg', dose)
                 asm(base + '_daily_mg_delta', dose - old if dose is not None and old is not None else None)
             changes_12 = []
-            for months in (6, 12):
-                part = group[bisect_left(visit_dates, add_months(prediction, -months), 0, i):i]
+            for months in windows:
+                part = group[bisect_left(visit_dates, window_starts[months], 0, stop):stop]
                 pairs = [(a, b) for a, b in zip(part, part[1:]) if a['med']['complete'] and b['med']['complete']]
                 changes = [b['date'] for a, b in pairs if a['med']['known'] != b['med']['known']]
                 asm(f'asm_assessable_pairs_{months}m', len(pairs))
                 asm(f'asm_composition_changes_{months}m', len(changes) if pairs else None)
-                if months == 12:
+                if months == history_months:
                     changes_12 = changes
             asm('asm_days_since_last_observed_composition_change', (prediction - changes_12[-1]).days if changes_12 else None)
-            upper = prediction - dt.timedelta(days=1)
-            for months, start in ((6, recent), (12, lower)):
-                for key, value in seizure_window(events[pid], prediction, start, upper).items():
+            upper = end - dt.timedelta(days=1)
+            for months in windows:
+                start = window_starts[months]
+                for key, value in seizure_window(events[pid], end, start, upper).items():
                     put(f'seizure_{key}_{months}m', value, 'dbo.SeizureEventViewModel', 'Completed and available intervals only; union coverage and overlap-safe contained-count lower bounds')
-            earlier = seizure_window(events[pid], prediction, lower, recent - dt.timedelta(days=1))
-            rate = row.get('seizure_rate_lower_bound_per30d_6m')
-            delta = rate - earlier['rate_lower_bound_per30d'] if rate is not None and earlier['rate_lower_bound_per30d'] is not None else None
-            put('seizure_recent_vs_earlier_6m_rate_delta', delta, 'dbo.SeizureEventViewModel', 'Recent minus earlier six-month lower-bound rates; interpret with coverage')
-            put('seizure_earlier_6m_coverage_fraction', earlier['coverage_fraction'], 'dbo.SeizureEventViewModel', 'Known coverage in months 6-12 before prediction')
+            if history_months == 12:
+                earlier = seizure_window(events[pid], prediction, lower, recent - dt.timedelta(days=1))
+                rate = row.get('seizure_rate_lower_bound_per30d_6m')
+                delta = rate - earlier['rate_lower_bound_per30d'] if rate is not None and earlier['rate_lower_bound_per30d'] is not None else None
+                put('seizure_recent_vs_earlier_6m_rate_delta', delta, 'dbo.SeizureEventViewModel', 'Recent minus earlier six-month lower-bound rates; interpret with coverage')
+                put('seizure_earlier_6m_coverage_fraction', earlier['coverage_fraction'], 'dbo.SeizureEventViewModel', 'Known coverage in months 6-12 before prediction')
             for feature, (dates, values) in measures[pid].items():
-                for key, value in numeric_history(dates, values, prediction).items():
+                for key, value in numeric_history(dates, values, prediction, history_months, lower=lower, end=end).items():
                     if value is not None:
                         row[feature + '__' + key] = value
-            for name, value in eeg_history_features(eeg_index[pid], prediction).items():
+            for name, value in eeg_history_features(eeg_index[pid], prediction, history_months, lower=lower, end=end).items():
                 if value is not None:
                     row[name] = value
             for domain in EXAMS:
                 dates = exams[pid].get(domain, [])
-                right, first = bisect_left(dates, prediction), bisect_left(dates, lower)
-                for suffix, value in [('dates_12m', right - first), ('dates_6m', right - bisect_left(dates, recent)),
-                                      ('latest_age_days', (prediction - dates[right - 1]).days if right > first else None)]:
+                right, first = bisect_left(dates, end), bisect_left(dates, lower)
+                timings = [(f'dates_{m}m', right - bisect_left(dates, window_starts[m])) for m in windows]
+                timings.append(('latest_age_days', (prediction - dates[right - 1]).days if right > first else None))
+                for suffix, value in timings:
                     put(domain + '_' + suffix, value, 'dbo.' + EXAMS[domain][0], 'Database examination timing; encoded EEG content is represented separately')
-            right, first = bisect_left(label_dates, prediction), bisect_left(label_dates, lower)
+            right, first = bisect_left(label_dates, end), bisect_left(label_dates, lower)
             part = labels[pid][first:right]
             current = labels[pid][right - 1] if right else None
             known = [r['status'] for r in part if r['status'] is not None]
@@ -407,16 +428,10 @@ def build_features(tables, as_of, progress=None, male_code='1', include_doses=Tr
                 monthly_positive_fraction_12m=sum(known) / len(known) if known else None,
                 monthly_observed_switches_12m=sum(a['status'] != b['status'] for a, b in adjacent) if adjacent else None)
             for name, value in values.items():
-                put(name, value, 'dbo.PatientMonthlyDreStatus', 'Completed month-end history strictly before prediction; unknowns are not filled')
-            meta = dict(patient_id=pid, prediction_date=prediction, history_start=lower, source_asm_record_id=str(visit['id']),
+                if include_status_history:
+                    put(name.replace('12m', f'{history_months}m'), value, 'dbo.PatientMonthlyDreStatus', 'Completed month-end history strictly before prediction; unknowns are not filled')
+            meta = dict(patient_id=pid, prediction_date=prediction, history_start=lower, history_end_exclusive=end, source_asm_record_id=str(visit['id']),
                         current_state_date=current['date'] if current else None, current_dre=values['current_dre'])
-            for months in (6, 12):
-                target_date = month_end(add_months(prediction, months))
-                key = pid, target_date
-                target = target_lookup.get(key) if target_date <= as_of else None
-                meta[f'target_date_{months}m'] = target_date
-                meta[f'target_dre_{months}m'] = target
-                meta[f'outcome_reason_{months}m'] = 'known' if target is not None else 'beyond_snapshot' if target_date > as_of else 'unknown_label' if key in target_lookup else 'missing_month'
             metadata.append(meta)
             patient_rows.append(row)
         if patient_rows:
@@ -432,19 +447,24 @@ def build_features(tables, as_of, progress=None, male_code='1', include_doses=Tr
         for name in omitted:
             dictionary.pop(name)
     for name in features.columns:
-        if name.endswith('__observations_12m'):
+        if name.endswith(f'__observations_{history_months}m'):
             features[name] = features[name].fillna(0)
     metadata = pd.DataFrame(metadata)
-    for name in ('current_dre', 'target_dre_6m', 'target_dre_12m'):
-        metadata[name] = metadata[name].astype('Int8')
+    metadata['current_dre'] = metadata['current_dre'].astype('Int8')
+    for name, spec in dictionary.items():
+        if name not in ('age_years', 'sex_male'):
+            spec['history_start_months_before_prediction'] = 12
+            spec['history_end_months_before_prediction'] = 12 - history_months
+            spec['history_end_exclusive'] = True
     if np.isinf(features.to_numpy()).any():
         raise ValueError('Feature overflow; review source numeric values')
     audit = dict(patient_count=len(patients), patients_with_visits=int(metadata.patient_id.nunique()), prediction_visits=len(metadata),
         feature_count=len(features.columns), all_missing_features=int(features.isna().all().sum()),
-        as_of=as_of.isoformat(), history_months=12, prediction_timing='strictly before medication visit',
+        as_of=as_of.isoformat(), history_months=history_months, history_anchor_months=12, status_history_included=include_status_history,
+        prediction_timing='strictly before medication visit',
         daily_dose_unit='mg/day', dose_features_included=include_doses, numeric_male_code=male_code,
         dose_value_policy='Preserve stored doses without clipping; largest source doses listed for review',
-        source_issues=dict(sorted(issues.items())), outcomes={}, eeg_encoding=eeg_summary, eeg_report_audit=eeg_review,
+        source_issues=dict(sorted(issues.items())), eeg_encoding=eeg_summary, eeg_report_audit=eeg_review,
         limitations=['Recording timestamps unavailable; observation dates are used.',
             'EEG findings use the existing rule encoder and require representative clinical review; imaging remains timing-only.',
             'Lab recognition is conservative; unrecognized keys and censored values are excluded.',
@@ -457,8 +477,4 @@ def build_features(tables, as_of, progress=None, male_code='1', include_doses=Tr
     audit['largest_stored_daily_doses_for_review'] = [dict(drug_detail_id=str(r['Id']),
         asm_record_id=str(r['AsmRecordViewModelId']), substance=normalized(r.get('DrugName')),
         daily_mg=number(r['DailyDose'])) for r in largest_doses]
-    for months in (6, 12):
-        target = metadata[f'target_dre_{months}m']
-        audit['outcomes'][f'{months}m'] = dict(positive=int(target.eq(1).sum()), negative=int(target.eq(0).sum()),
-            unknown=int(target.isna().sum()), reasons=metadata[f'outcome_reason_{months}m'].value_counts().to_dict())
     return features, metadata, dictionary, audit

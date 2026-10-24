@@ -1,96 +1,149 @@
-# Value-based DRE/NDRE prediction
+# DRE/NDRE visit-status prediction
 
-`train.py` builds pre-visit features or trains random forests estimating any
-observed monthly state switch within 6 and 12 months. It reuses one saved
-50-50 patient split (132 training, 133 test); no cross-validation is used.
-Training ranks all usable candidates on training patients and refits a model
-with the top 30 source features separately for each direction and horizon.
+The value-based workflow estimates **P(DRE at each medication visit)** with
+four independent random forests using 3, 6, 9, or 12 calendar months of clinical
+history. P(NDRE) is 1 minus P(DRE). The future state-switch model is retired.
 
-## Active scripts
+## History windows
 
-| Path | Purpose | Used by `train.py`? |
+Every history window starts **12 calendar months before the prediction visit**.
+The start is inclusive and the end is exclusive:
+
+| Model | History start | History end (exclusive) |
 |---|---|---|
-| `train.py` | Feature-building/training entry point and patient split | Entry point |
-| `forest_workflow.py` | Training-only preprocessing, feature ranking, forests, risk outputs, evaluation | With `--train-forest` |
-| `risk_targets.py` | Any-switch labels, follow-up coverage, directional risk percentages | Through forest workflow |
-| `longitudinal_features.py` | Past-only levels, changes, coverage, outcomes | Directly |
-| `eeg_features.py` | Adapt database EEG text to existing ordinal/presence/change features | Through feature builder |
-| `sql_snapshot.py` | Load and verify saved snapshot files | Directly |
-| `tools/sql_data_loader.py` | Extract or inspect the live database | Separate maintenance command |
-| `tools/verify_all_tables.py` | Compare a saved extraction with the live database | Separate maintenance command |
-| `tests/test_longitudinal_features.py` | Feature timing, changes, labels, and split regression checks | Test suite |
-| `tests/test_eeg_features.py` | EEG encoding, negatives, report timing, and change checks | Test suite |
-| `tests/test_sql_snapshot.py` | Snapshot serialization/checksum/schema regression checks | Test suite |
-| `tests/test_risk_targets.py` | Intermediate switches, reversals, censoring, monthly boundaries | Test suite |
-| `tests/test_forest_workflow.py` | Training-only filtering/ranking, patient weights, model reload, metrics | Test suite |
+| 3-month history | Prediction minus 12 months | Prediction minus 9 months |
+| 6-month history | Prediction minus 12 months | Prediction minus 6 months |
+| 9-month history | Prediction minus 12 months | Prediction minus 3 months |
+| 12-month history | Prediction minus 12 months | Prediction visit |
 
-The feature module also imports audited helpers from
-`Database/dre_onset_analysis/analyze_onset.py` and `monthly_dre.py`.
-Those files remain required dependencies. Other repository folders support
-separate parsing, plotting, image-model, and database workflows.
+For a prediction on January 15, 2020, the windows are January 15 to April 15, 2019;
+January 15 to July 15, 2019; January 15 to October 15, 2019; and January 15, 2019
+to January 15, 2020, respectively.
+Calendar offsets are calculated from the prediction date, clipping to the last
+day when necessary. Each model's probabilities may differ without a required
+ordering.
 
-The EEG adapter imports `docx_parsers/docx_parser_eeg_timeline.py` and reuses
-`EegReport`/`parse_report()` directly on `EegRecords.Note`. It does not read DOCX
-files or call the abnormal-only DOCX extraction/aggregation path. The original
-encoder remains unchanged for existing document/plotting workflows.
+Medications, labs, cognition, EEG, imaging timing, seizure summaries, and changes
+are restricted to the respective history window. Linked seizure reports and
+embedded EEG findings must also be available strictly before its end. Evidence
+from the gap between a shorter window and prediction cannot enter that model.
+Measurement ages are measured at the prediction visit. Age and immutable sex
+remain available. Prior monthly status labels and unrestricted history-length
+features are excluded. Missing values remain missing until training-only
+imputation. Visits with sparse or no dynamic history are included; a complete
+recorded history window is not required.
 
-The extraction and validation scripts are retained because they are needed to
-rebuild or verify data. They are separated from the active training files rather
-than treated as dead code merely because training does not call them.
+## Visit labels
 
-## Commands from the project root
+All models share the same visit labels and a reproducible 50/50 patient split
+generated from the snapshot. The operational target uses visit-day medications
+and seizure evidence
+available by that date under the project's existing three-valued rules. Its
+seizure interval is always `(visit minus 12 calendar months, visit]`, regardless
+of input length.
 
-Train the all-feature comparison and fixed top-30 models:
+If visit-date status is unknown, the latest monthly assessment strictly before
+the visit supplies the label only when that assessment is known. An unknown
+latest month is not skipped to retrieve an older known label. Known visit-date
+labels take precedence. Remaining unknown labels are retained for audit and
+scoring but excluded from fitting and evaluation.
 
-```powershell
-.\.venv\Scripts\python.exe "value based model/train.py" --train-forest --panel all --top-features 30 --output-dir "value based model/results/rf_NEW_RUN"
-```
+## Workflow
 
-The default feature input is `data/features/previsit_20261016_eeg_v1/`.
-Each task fits an all-feature forest, ranks source features by training impurity
-importance (including their missingness indicators), then fits the selected
-forest. Test data never select features, feature count, settings, or thresholds.
-A full-panel comparison excluding explicit change features is also reported.
-The selected model supplies the saved percentages even if the full model scores
-better. These are raw, uncalibrated research estimates.
+| Entry point under `value based model/` | Reads | Produces |
+|---|---|---|
+| `extract_sql.py` | Live EpilepsyDB through read-only queries | SQL snapshot, schema, checksums |
+| `build_visit_status.py` | Saved snapshot | Separate histories, shared visit targets, generated patient split, audits, manifest |
+| `train.py` | Prepared visit-status bundle | Forests, feature rankings, probabilities, held-out evaluation, confusion matrices |
 
-For a starting NDRE state, the applicable risk is NDRE-to-DRE; for a starting DRE
-state it is DRE-to-NDRE. A subsequent reversal does not erase the event. The
-other direction is inapplicable; no-switch risk is the complementary percentage.
-This concerns observed monthly labels and cannot detect intervening switches
-that reverse between monthly assessments.
-
-Results include `report.md`, `metrics.json`, `feature_importance.json` (every
-candidate and exclusion reason), `selected_features.json`, saved pipelines,
-`switch_targets.jsonl`, and `heldout_risk_predictions.jsonl`. The combined
-`risk_predictions.jsonl` includes explicitly marked in-sample training rows.
-Unknown starting states receive no directional risk; missing follow-up is not
-automatically labeled no-switch. Output folders contain patient-level data and
-are ignored by Git. Use a new directory for each run.
-
-Build a new feature bundle:
+Extract when the source data need updating:
 
 ```powershell
-.\.venv\Scripts\python.exe "value based model/train.py" --output-dir "value based model/data/features/previsit_NEW_RUN"
+.\.venv\Scripts\python.exe "value based model/extract_sql.py" --output-dir "value based model/data/sql_snapshots/epilepsydb_NEW_RUN"
 ```
 
-Run all local model/snapshot regression tests:
+Prepare histories and labels with a new reproducible patient split:
+
+```powershell
+.\.venv\Scripts\python.exe "value based model/build_visit_status.py" --snapshot-dir "value based model/data/sql_snapshots/20261017" --output-dir "value based model/data/features/visit_status_NEW_RUN" --seed 42
+```
+
+Preparation shuffles sorted snapshot patient IDs using `--seed` (default 42),
+assigns half to training (rounded down) and the remainder to testing, and saves
+`patient_split.json` inside the new bundle. For 265 patients this gives 132
+training and 133 test patients. All visits for a patient stay in one group.
+Assignment does not use outcomes or visit counts. The same patient IDs and seed
+reproduce the same split regardless of snapshot row order. The seed and method
+are recorded in provenance. No earlier split file is required.
+
+Train and evaluate from the prepared bundle:
+
+```powershell
+.\.venv\Scripts\python.exe "value based model/train.py" --feature-dir "value based model/data/features/visit_status_NEW_RUN" --output-dir "value based model/results/rf_visit_status_NEW_RUN"
+```
+
+Use a new output directory for every run. Training verifies checksums and
+alignment and does not reopen SQL or the snapshot, rebuild features, recalculate
+labels, or change patient assignments. Format-2 visit-status bundles record the
+12-month anchor and all four history windows; bundles containing only 3-, 6-,
+and 12-month histories must be rebuilt before training.
+
+All-feature and training-selected top-20 forests use training-only preprocessing
+and feature ranking. Each patient has equal total fitting and evaluation weight.
+All models are evaluated on the same labeled visits from held-out patients,
+alongside a training-prevalence baseline. No cross-validation, threshold tuning,
+test-based feature selection, or calibration fitting is performed.
+
+Outputs include `report.md`, `metrics.json`, saved `VisitStatusModel` pipelines,
+feature rankings, and `heldout_status_predictions.jsonl`. Each prediction records
+DRE/NDRE percentages, a threshold-0.5 class, and the inclusive history start and
+exclusive history end for each model. `status_predictions.jsonl` also includes
+explicitly marked in-sample training patients.
+
+Training automatically saves twelve PNG confusion matrices under
+`confusion_matrices/`: all-feature, selected-feature, and prevalence-baseline
+results for each 3-, 6-, 9-, and 12-month history. The report links to each image.
+Rows show actual DRE/NDRE status and columns show predicted DRE/NDRE status,
+with the predicted labels at the top, at threshold 0.5. DRE is the positive
+class. The default blue heatmap reflects visit counts. Each cell shows only an
+unweighted held-out visit count and its
+percentage within the observed class; N/A indicates an absent observed class.
+The report's performance metrics continue to use patient weights.
+
+Training also saves `roc_comparison.png`, overlaying the 3-, 6-, 9-, and 12-month
+selected-feature models on one ROC plot, with AUROCs in the legend and a chance
+diagonal. All four curves use the same labeled held-out visits and equal-patient
+weights as the performance metrics. Unknown labels are excluded. Curve points
+and AUROCs are saved in `roc_curves.json`, and the report embeds the plot.
+
+Generate plots for an existing visit-status results directory without retraining:
+
+```powershell
+.\.venv\Scripts\python.exe "value based model/plot_confusion_matrices.py" --results-dir "value based model/results/rf_visit_status_NEW_RUN"
+.\.venv\Scripts\python.exe "value based model/plot_roc_curves.py" --results-dir "value based model/results/rf_visit_status_NEW_RUN"
+```
+
+Percentages are uncalibrated estimates of the project-derived status. Labels
+are not independently adjudicated outcomes. Observation and linked visit dates
+approximate availability because recording timestamps are unavailable. Scores
+on visits with unknown outcomes are not validated by the evaluation. Historical
+data and model runs remain saved.
+
+## Supporting modules and verification
+
+`sql_snapshot.py` handles snapshots; `longitudinal_features.py` builds clinical
+histories; `eeg_features.py` adapts the existing EEG encoder;
+`visit_status_targets.py` builds visit labels; `forest_workflow.py` supplies
+shared fitting and evaluation; `visit_status_workflow.py` validates bundles,
+trains status models, and writes reports. Clinical rules remain under
+`Database/dre_onset_analysis/`, with the existing
+`docx_parsers/docx_parser_eeg_timeline.py` encoder.
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest discover -s "value based model" -v
-```
-
-Create a new database extraction:
-
-```powershell
-.\.venv\Scripts\python.exe "value based model/tools/sql_data_loader.py" --all-tables --output-dir "value based model/data/sql_snapshots/epilepsydb_NEW_RUN"
-```
-
-Compare that extraction with a fresh database read:
-
-```powershell
 .\.venv\Scripts\python.exe "value based model/tools/verify_all_tables.py" "value based model/data/sql_snapshots/epilepsydb_NEW_RUN"
 ```
 
-See `FEATURE_BUILDING.md` for output files and feature definitions,
-`SQL_DATA_LOADING.md` for extraction details, and `TRAINING_PLAN.md` for the model plan.
+Synthetic fixtures live in `tests/helpers.py`. Tests cover history boundaries,
+evidence availability, target timing, model serialization, reports, snapshot
+integrity, and separation of extraction, preparation, and training.
