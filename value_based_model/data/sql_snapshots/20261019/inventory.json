@@ -1,0 +1,4117 @@
+[
+  {
+    "table": "dbo.__EFMigrationsHistory",
+    "schema": "dbo",
+    "name": "__EFMigrationsHistory",
+    "rows": 35,
+    "columns": 2,
+    "role": "database_metadata",
+    "primary_key": [
+      "MigrationId"
+    ],
+    "foreign_key_columns": [],
+    "patient_join_path": null,
+    "temporal_columns": [],
+    "numeric_columns_to_review": [],
+    "feature_review_flags": {
+      "MigrationId": [
+        "Identifier/join key; exclude from predictors"
+      ]
+    },
+    "column_profile": [
+      {
+        "column": "MigrationId",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 35
+      },
+      {
+        "column": "ProductVersion",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 1
+      }
+    ]
+  },
+  {
+    "table": "dbo.AdverseReactionDetail",
+    "schema": "dbo",
+    "name": "AdverseReactionDetail",
+    "rows": 43,
+    "columns": 5,
+    "role": "clinical_records",
+    "primary_key": [
+      "Id"
+    ],
+    "foreign_key_columns": [
+      "PatientBaselineViewModelPatientId"
+    ],
+    "patient_join_path": [
+      {
+        "constraint": "FK_AdverseReactionDetail_Patients_PatientBaselineViewModelPatientId",
+        "child_schema": "dbo",
+        "child_table": "AdverseReactionDetail",
+        "parent_schema": "dbo",
+        "parent_table": "Patients",
+        "columns": [
+          {
+            "child": "PatientBaselineViewModelPatientId",
+            "parent": "PatientId"
+          }
+        ]
+      }
+    ],
+    "temporal_columns": [],
+    "numeric_columns_to_review": [],
+    "feature_review_flags": {
+      "Id": [
+        "Identifier/join key; exclude from predictors"
+      ],
+      "PatientBaselineViewModelPatientId": [
+        "Identifier/join key; exclude from predictors"
+      ]
+    },
+    "column_profile": [
+      {
+        "column": "Id",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 43
+      },
+      {
+        "column": "AsmName",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 35
+      },
+      {
+        "column": "AsmDose",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 7,
+        "missing_fraction": 0.16279069767441862,
+        "distinct_non_null": 33
+      },
+      {
+        "column": "AdverseResponse",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 1,
+        "missing_fraction": 0.023255813953488372,
+        "distinct_non_null": 42
+      },
+      {
+        "column": "PatientBaselineViewModelPatientId",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 43
+      }
+    ]
+  },
+  {
+    "table": "dbo.AntigenRecords",
+    "schema": "dbo",
+    "name": "AntigenRecords",
+    "rows": 4,
+    "columns": 6,
+    "role": "clinical_records",
+    "primary_key": [
+      "Id"
+    ],
+    "foreign_key_columns": [
+      "PatientBaselineViewModelPatientId"
+    ],
+    "patient_join_path": [
+      {
+        "constraint": "FK_AntigenRecords_Patients_PatientBaselineViewModelPatientId",
+        "child_schema": "dbo",
+        "child_table": "AntigenRecords",
+        "parent_schema": "dbo",
+        "parent_table": "Patients",
+        "columns": [
+          {
+            "child": "PatientBaselineViewModelPatientId",
+            "parent": "PatientId"
+          }
+        ]
+      }
+    ],
+    "temporal_columns": [
+      "Date"
+    ],
+    "numeric_columns_to_review": [],
+    "feature_review_flags": {
+      "Id": [
+        "Identifier/join key; exclude from predictors"
+      ],
+      "Note": [
+        "Free text; review timing and outcome mentions before encoding"
+      ],
+      "PatientBaselineViewModelPatientId": [
+        "Identifier/join key; exclude from predictors"
+      ]
+    },
+    "column_profile": [
+      {
+        "column": "Id",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 4
+      },
+      {
+        "column": "Date",
+        "sql_type": "datetime2",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 4
+      },
+      {
+        "column": "TestName",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 2
+      },
+      {
+        "column": "Result",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 1
+      },
+      {
+        "column": "Note",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 4
+      },
+      {
+        "column": "PatientBaselineViewModelPatientId",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 4
+      }
+    ]
+  },
+  {
+    "table": "dbo.AsmDrugDetail",
+    "schema": "dbo",
+    "name": "AsmDrugDetail",
+    "rows": 95138,
+    "columns": 9,
+    "role": "clinical_records",
+    "primary_key": [
+      "Id"
+    ],
+    "foreign_key_columns": [
+      "AsmRecordViewModelId"
+    ],
+    "patient_join_path": [
+      {
+        "constraint": "FK_AsmDrugDetail_AsmRecords_AsmRecordViewModelId",
+        "child_schema": "dbo",
+        "child_table": "AsmDrugDetail",
+        "parent_schema": "dbo",
+        "parent_table": "AsmRecords",
+        "columns": [
+          {
+            "child": "AsmRecordViewModelId",
+            "parent": "Id"
+          }
+        ]
+      },
+      {
+        "constraint": "FK_AsmRecords_Patients_PatientBaselineViewModelPatientId",
+        "child_schema": "dbo",
+        "child_table": "AsmRecords",
+        "parent_schema": "dbo",
+        "parent_table": "Patients",
+        "columns": [
+          {
+            "child": "PatientBaselineViewModelPatientId",
+            "parent": "PatientId"
+          }
+        ]
+      }
+    ],
+    "temporal_columns": [],
+    "numeric_columns_to_review": [
+      "Quantity",
+      "MgPerUnit",
+      "DailyDose",
+      "WhoDddValue"
+    ],
+    "feature_review_flags": {
+      "Id": [
+        "Identifier/join key; exclude from predictors"
+      ],
+      "AsmRecordViewModelId": [
+        "Identifier/join key; exclude from predictors"
+      ]
+    },
+    "column_profile": [
+      {
+        "column": "Id",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 95138
+      },
+      {
+        "column": "DrugName",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 35
+      },
+      {
+        "column": "Quantity",
+        "sql_type": "float",
+        "pandas_dtype": "Float64",
+        "missing_count": 290,
+        "missing_fraction": 0.003048203662048813,
+        "distinct_non_null": 50
+      },
+      {
+        "column": "Unit",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 326,
+        "missing_fraction": 0.0034266013580272867,
+        "distinct_non_null": 38
+      },
+      {
+        "column": "MgPerUnit",
+        "sql_type": "float",
+        "pandas_dtype": "Float64",
+        "missing_count": 565,
+        "missing_fraction": 0.005938741617439929,
+        "distinct_non_null": 56
+      },
+      {
+        "column": "DailyDose",
+        "sql_type": "float",
+        "pandas_dtype": "Float64",
+        "missing_count": 1914,
+        "missing_fraction": 0.020118144169522168,
+        "distinct_non_null": 173
+      },
+      {
+        "column": "WhoDddValue",
+        "sql_type": "float",
+        "pandas_dtype": "Float64",
+        "missing_count": 2249,
+        "missing_fraction": 0.023639344951544072,
+        "distinct_non_null": 11
+      },
+      {
+        "column": "AsmRecordViewModelId",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 43418
+      },
+      {
+        "column": "Frequency",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 476,
+        "missing_fraction": 0.005003258424604259,
+        "distinct_non_null": 448
+      }
+    ]
+  },
+  {
+    "table": "dbo.AsmDrugSettings",
+    "schema": "dbo",
+    "name": "AsmDrugSettings",
+    "rows": 15,
+    "columns": 6,
+    "role": "lookup_settings",
+    "primary_key": [
+      "Id"
+    ],
+    "foreign_key_columns": [],
+    "patient_join_path": null,
+    "temporal_columns": [],
+    "numeric_columns_to_review": [],
+    "feature_review_flags": {
+      "Id": [
+        "Identifier/join key; exclude from predictors"
+      ]
+    },
+    "column_profile": [
+      {
+        "column": "Id",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 15
+      },
+      {
+        "column": "ActiveSubstance",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 15
+      },
+      {
+        "column": "WhoDddValue",
+        "sql_type": "float",
+        "pandas_dtype": "Float64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 8
+      },
+      {
+        "column": "DrugLabel",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 15
+      },
+      {
+        "column": "MgPerUnit",
+        "sql_type": "float",
+        "pandas_dtype": "Float64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 11
+      },
+      {
+        "column": "DefaultUnit",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 1
+      }
+    ]
+  },
+  {
+    "table": "dbo.AsmRecords",
+    "schema": "dbo",
+    "name": "AsmRecords",
+    "rows": 43585,
+    "columns": 8,
+    "role": "clinical_records",
+    "primary_key": [
+      "Id"
+    ],
+    "foreign_key_columns": [
+      "PatientBaselineViewModelPatientId"
+    ],
+    "patient_join_path": [
+      {
+        "constraint": "FK_AsmRecords_Patients_PatientBaselineViewModelPatientId",
+        "child_schema": "dbo",
+        "child_table": "AsmRecords",
+        "parent_schema": "dbo",
+        "parent_table": "Patients",
+        "columns": [
+          {
+            "child": "PatientBaselineViewModelPatientId",
+            "parent": "PatientId"
+          }
+        ]
+      }
+    ],
+    "temporal_columns": [
+      "Date"
+    ],
+    "numeric_columns_to_review": [],
+    "feature_review_flags": {
+      "Id": [
+        "Identifier/join key; exclude from predictors"
+      ],
+      "SoapReason": [
+        "Free text; review timing and outcome mentions before encoding"
+      ],
+      "DxPlan": [
+        "Free text; review timing and outcome mentions before encoding"
+      ],
+      "Note": [
+        "Free text; review timing and outcome mentions before encoding"
+      ],
+      "PatientBaselineViewModelPatientId": [
+        "Identifier/join key; exclude from predictors"
+      ],
+      "SeizureNote": [
+        "Free text; review timing and outcome mentions before encoding"
+      ]
+    },
+    "column_profile": [
+      {
+        "column": "Id",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 43585
+      },
+      {
+        "column": "Date",
+        "sql_type": "datetime2",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 4544
+      },
+      {
+        "column": "IsWuVisit",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 587,
+        "missing_fraction": 0.013467936216588277,
+        "distinct_non_null": 3
+      },
+      {
+        "column": "SoapReason",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 43585,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "DxPlan",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 43585,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Note",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 43165,
+        "missing_fraction": 0.9903636572215212,
+        "distinct_non_null": 110
+      },
+      {
+        "column": "PatientBaselineViewModelPatientId",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 265
+      },
+      {
+        "column": "SeizureNote",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 43585,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      }
+    ]
+  },
+  {
+    "table": "dbo.BioChemItemSettings",
+    "schema": "dbo",
+    "name": "BioChemItemSettings",
+    "rows": 56,
+    "columns": 6,
+    "role": "lookup_settings",
+    "primary_key": [
+      "Id"
+    ],
+    "foreign_key_columns": [],
+    "patient_join_path": null,
+    "temporal_columns": [],
+    "numeric_columns_to_review": [],
+    "feature_review_flags": {
+      "Id": [
+        "Identifier/join key; exclude from predictors"
+      ]
+    },
+    "column_profile": [
+      {
+        "column": "Id",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 56
+      },
+      {
+        "column": "Name",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 56
+      },
+      {
+        "column": "SortOrder",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 56
+      },
+      {
+        "column": "RefMax",
+        "sql_type": "float",
+        "pandas_dtype": "Float64",
+        "missing_count": 6,
+        "missing_fraction": 0.10714285714285714,
+        "distinct_non_null": 43
+      },
+      {
+        "column": "RefMin",
+        "sql_type": "float",
+        "pandas_dtype": "Float64",
+        "missing_count": 20,
+        "missing_fraction": 0.35714285714285715,
+        "distinct_non_null": 29
+      },
+      {
+        "column": "NormalTextValue",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 49,
+        "missing_fraction": 0.875,
+        "distinct_non_null": 3
+      }
+    ]
+  },
+  {
+    "table": "dbo.BioChemRecords",
+    "schema": "dbo",
+    "name": "BioChemRecords",
+    "rows": 3143,
+    "columns": 4,
+    "role": "clinical_records",
+    "primary_key": [
+      "Id"
+    ],
+    "foreign_key_columns": [
+      "PatientBaselineViewModelPatientId"
+    ],
+    "patient_join_path": [
+      {
+        "constraint": "FK_BioChemRecords_Patients_PatientBaselineViewModelPatientId",
+        "child_schema": "dbo",
+        "child_table": "BioChemRecords",
+        "parent_schema": "dbo",
+        "parent_table": "Patients",
+        "columns": [
+          {
+            "child": "PatientBaselineViewModelPatientId",
+            "parent": "PatientId"
+          }
+        ]
+      }
+    ],
+    "temporal_columns": [
+      "Date"
+    ],
+    "numeric_columns_to_review": [],
+    "feature_review_flags": {
+      "Id": [
+        "Identifier/join key; exclude from predictors"
+      ],
+      "PatientBaselineViewModelPatientId": [
+        "Identifier/join key; exclude from predictors"
+      ]
+    },
+    "column_profile": [
+      {
+        "column": "Id",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 3143
+      },
+      {
+        "column": "Date",
+        "sql_type": "datetime2",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 2280
+      },
+      {
+        "column": "DynamicDataJson",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 3121
+      },
+      {
+        "column": "PatientBaselineViewModelPatientId",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 262
+      }
+    ]
+  },
+  {
+    "table": "dbo.BrainImages",
+    "schema": "dbo",
+    "name": "BrainImages",
+    "rows": 806,
+    "columns": 5,
+    "role": "clinical_records",
+    "primary_key": [
+      "Id"
+    ],
+    "foreign_key_columns": [
+      "PatientBaselineViewModelPatientId"
+    ],
+    "patient_join_path": [
+      {
+        "constraint": "FK_BrainImages_Patients_PatientBaselineViewModelPatientId",
+        "child_schema": "dbo",
+        "child_table": "BrainImages",
+        "parent_schema": "dbo",
+        "parent_table": "Patients",
+        "columns": [
+          {
+            "child": "PatientBaselineViewModelPatientId",
+            "parent": "PatientId"
+          }
+        ]
+      }
+    ],
+    "temporal_columns": [
+      "ExaminationDate"
+    ],
+    "numeric_columns_to_review": [],
+    "feature_review_flags": {
+      "Id": [
+        "Identifier/join key; exclude from predictors"
+      ],
+      "Note": [
+        "Free text; review timing and outcome mentions before encoding"
+      ],
+      "PatientBaselineViewModelPatientId": [
+        "Identifier/join key; exclude from predictors"
+      ]
+    },
+    "column_profile": [
+      {
+        "column": "Id",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 806
+      },
+      {
+        "column": "ImageType",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 3
+      },
+      {
+        "column": "ExaminationDate",
+        "sql_type": "datetime2",
+        "pandas_dtype": "string",
+        "missing_count": 222,
+        "missing_fraction": 0.27543424317617865,
+        "distinct_non_null": 553
+      },
+      {
+        "column": "Note",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 222,
+        "missing_fraction": 0.27543424317617865,
+        "distinct_non_null": 568
+      },
+      {
+        "column": "PatientBaselineViewModelPatientId",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 264
+      }
+    ]
+  },
+  {
+    "table": "dbo.BrainImageTypeSettings",
+    "schema": "dbo",
+    "name": "BrainImageTypeSettings",
+    "rows": 4,
+    "columns": 2,
+    "role": "lookup_settings",
+    "primary_key": [
+      "Id"
+    ],
+    "foreign_key_columns": [],
+    "patient_join_path": null,
+    "temporal_columns": [],
+    "numeric_columns_to_review": [],
+    "feature_review_flags": {
+      "Id": [
+        "Identifier/join key; exclude from predictors"
+      ]
+    },
+    "column_profile": [
+      {
+        "column": "Id",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 4
+      },
+      {
+        "column": "TypeName",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 4
+      }
+    ]
+  },
+  {
+    "table": "dbo.BrainRegionSettings",
+    "schema": "dbo",
+    "name": "BrainRegionSettings",
+    "rows": 5,
+    "columns": 4,
+    "role": "lookup_settings",
+    "primary_key": [
+      "Id"
+    ],
+    "foreign_key_columns": [
+      "PatientBaselineViewModelPatientId"
+    ],
+    "patient_join_path": [
+      {
+        "constraint": "FK_BrainRegionSettings_Patients_PatientBaselineViewModelPatientId",
+        "child_schema": "dbo",
+        "child_table": "BrainRegionSettings",
+        "parent_schema": "dbo",
+        "parent_table": "Patients",
+        "columns": [
+          {
+            "child": "PatientBaselineViewModelPatientId",
+            "parent": "PatientId"
+          }
+        ]
+      }
+    ],
+    "temporal_columns": [],
+    "numeric_columns_to_review": [],
+    "feature_review_flags": {
+      "Id": [
+        "Identifier/join key; exclude from predictors"
+      ],
+      "PatientBaselineViewModelPatientId": [
+        "Identifier/join key; exclude from predictors"
+      ]
+    },
+    "column_profile": [
+      {
+        "column": "Id",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 5
+      },
+      {
+        "column": "Name",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 5
+      },
+      {
+        "column": "SortOrder",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 5
+      },
+      {
+        "column": "PatientBaselineViewModelPatientId",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 5,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      }
+    ]
+  },
+  {
+    "table": "dbo.CasiRecords",
+    "schema": "dbo",
+    "name": "CasiRecords",
+    "rows": 430,
+    "columns": 57,
+    "role": "clinical_records",
+    "primary_key": [
+      "Id"
+    ],
+    "foreign_key_columns": [
+      "PatientBaselineViewModelPatientId"
+    ],
+    "patient_join_path": [
+      {
+        "constraint": "FK_CasiRecords_Patients_PatientBaselineViewModelPatientId",
+        "child_schema": "dbo",
+        "child_table": "CasiRecords",
+        "parent_schema": "dbo",
+        "parent_table": "Patients",
+        "columns": [
+          {
+            "child": "PatientBaselineViewModelPatientId",
+            "parent": "PatientId"
+          }
+        ]
+      }
+    ],
+    "temporal_columns": [
+      "Date"
+    ],
+    "numeric_columns_to_review": [],
+    "feature_review_flags": {
+      "Id": [
+        "Identifier/join key; exclude from predictors"
+      ],
+      "PatientBaselineViewModelPatientId": [
+        "Identifier/join key; exclude from predictors"
+      ]
+    },
+    "column_profile": [
+      {
+        "column": "Id",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 430
+      },
+      {
+        "column": "Date",
+        "sql_type": "datetime2",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 319
+      },
+      {
+        "column": "Q1",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 2,
+        "missing_fraction": 0.004651162790697674,
+        "distinct_non_null": 15
+      },
+      {
+        "column": "Q1_MONTH",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q1_BPL",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q1_BYR",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q1_BADY",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q1_SUN",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q2",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 2,
+        "missing_fraction": 0.004651162790697674,
+        "distinct_non_null": 36
+      },
+      {
+        "column": "Q2_RC1a",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q2_RC1b",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q2_RC1c",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q2_RC2a",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q2_RC2b",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q2_RC2c",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q2_RCOJ",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q3",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 2,
+        "missing_fraction": 0.004651162790697674,
+        "distinct_non_null": 12
+      },
+      {
+        "column": "Q3_RGS1",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q3_RPTa",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q3_RPTb",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q4",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 2,
+        "missing_fraction": 0.004651162790697674,
+        "distinct_non_null": 18
+      },
+      {
+        "column": "Q4_DBa",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q4_DBb",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q4_DBc",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q4_SUBa",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q4_SUBb",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q4_SUBc",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q5",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 2,
+        "missing_fraction": 0.004651162790697674,
+        "distinct_non_null": 23
+      },
+      {
+        "column": "Q5_AGE",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q5_YR",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q5_MO",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q5_DATE",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q5_DAY",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q5_TIME",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q5_Spa",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q5_SPb",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q6",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 2,
+        "missing_fraction": 0.004651162790697674,
+        "distinct_non_null": 20
+      },
+      {
+        "column": "Q6_SIMa",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q6_SIMb",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q6_SIMc",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q6_JGTa",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q6_JGTb",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q6_JGTc",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q7",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 2,
+        "missing_fraction": 0.004651162790697674,
+        "distinct_non_null": 17
+      },
+      {
+        "column": "Q7_READa",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q7_WRITE",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q7_NAMING",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q7_BODY",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q7_OBJa",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q7_OBJb",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q7_CMD",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q8",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 2,
+        "missing_fraction": 0.004651162790697674,
+        "distinct_non_null": 16
+      },
+      {
+        "column": "Q8_DRAW",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q9",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 2,
+        "missing_fraction": 0.004651162790697674,
+        "distinct_non_null": 16
+      },
+      {
+        "column": "Q9_ANML",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 430,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "PatientBaselineViewModelPatientId",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 204
+      },
+      {
+        "column": "TotalScore",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 8,
+        "missing_fraction": 0.018604651162790697,
+        "distinct_non_null": 119
+      }
+    ]
+  },
+  {
+    "table": "dbo.ClinicalFeatureSettings",
+    "schema": "dbo",
+    "name": "ClinicalFeatureSettings",
+    "rows": 7,
+    "columns": 2,
+    "role": "lookup_settings",
+    "primary_key": [
+      "Id"
+    ],
+    "foreign_key_columns": [],
+    "patient_join_path": null,
+    "temporal_columns": [],
+    "numeric_columns_to_review": [],
+    "feature_review_flags": {
+      "Id": [
+        "Identifier/join key; exclude from predictors"
+      ]
+    },
+    "column_profile": [
+      {
+        "column": "Id",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 7
+      },
+      {
+        "column": "Name",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 7
+      }
+    ]
+  },
+  {
+    "table": "dbo.DrugLevelItemSettings",
+    "schema": "dbo",
+    "name": "DrugLevelItemSettings",
+    "rows": 4,
+    "columns": 6,
+    "role": "lookup_settings",
+    "primary_key": [
+      "Id"
+    ],
+    "foreign_key_columns": [],
+    "patient_join_path": null,
+    "temporal_columns": [],
+    "numeric_columns_to_review": [],
+    "feature_review_flags": {
+      "Id": [
+        "Identifier/join key; exclude from predictors"
+      ]
+    },
+    "column_profile": [
+      {
+        "column": "Id",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 4
+      },
+      {
+        "column": "Name",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 4
+      },
+      {
+        "column": "SortOrder",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 4
+      },
+      {
+        "column": "RefMax",
+        "sql_type": "float",
+        "pandas_dtype": "Float64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 4
+      },
+      {
+        "column": "RefMin",
+        "sql_type": "float",
+        "pandas_dtype": "Float64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 4
+      },
+      {
+        "column": "NormalTextValue",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 4,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      }
+    ]
+  },
+  {
+    "table": "dbo.DrugLevelRecords",
+    "schema": "dbo",
+    "name": "DrugLevelRecords",
+    "rows": 3986,
+    "columns": 5,
+    "role": "clinical_records",
+    "primary_key": [
+      "Id"
+    ],
+    "foreign_key_columns": [
+      "PatientBaselineViewModelPatientId"
+    ],
+    "patient_join_path": [
+      {
+        "constraint": "FK_DrugLevelRecords_Patients_PatientBaselineViewModelPatientId",
+        "child_schema": "dbo",
+        "child_table": "DrugLevelRecords",
+        "parent_schema": "dbo",
+        "parent_table": "Patients",
+        "columns": [
+          {
+            "child": "PatientBaselineViewModelPatientId",
+            "parent": "PatientId"
+          }
+        ]
+      }
+    ],
+    "temporal_columns": [
+      "Date"
+    ],
+    "numeric_columns_to_review": [],
+    "feature_review_flags": {
+      "Id": [
+        "Identifier/join key; exclude from predictors"
+      ],
+      "Note": [
+        "Free text; review timing and outcome mentions before encoding"
+      ],
+      "PatientBaselineViewModelPatientId": [
+        "Identifier/join key; exclude from predictors"
+      ]
+    },
+    "column_profile": [
+      {
+        "column": "Id",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 3986
+      },
+      {
+        "column": "Date",
+        "sql_type": "datetime2",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 2874
+      },
+      {
+        "column": "DynamicDataJson",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 3445
+      },
+      {
+        "column": "Note",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 3986,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "PatientBaselineViewModelPatientId",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 206
+      }
+    ]
+  },
+  {
+    "table": "dbo.EegElectrodeSettings",
+    "schema": "dbo",
+    "name": "EegElectrodeSettings",
+    "rows": 30,
+    "columns": 3,
+    "role": "lookup_settings",
+    "primary_key": [
+      "Id"
+    ],
+    "foreign_key_columns": [],
+    "patient_join_path": null,
+    "temporal_columns": [],
+    "numeric_columns_to_review": [],
+    "feature_review_flags": {
+      "Id": [
+        "Identifier/join key; exclude from predictors"
+      ]
+    },
+    "column_profile": [
+      {
+        "column": "Id",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 30
+      },
+      {
+        "column": "ElectrodeName",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 24
+      },
+      {
+        "column": "BrainRegionId",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 8
+      }
+    ]
+  },
+  {
+    "table": "dbo.EegFocalityRecords",
+    "schema": "dbo",
+    "name": "EegFocalityRecords",
+    "rows": 160,
+    "columns": 5,
+    "role": "clinical_records",
+    "primary_key": [
+      "Id"
+    ],
+    "foreign_key_columns": [
+      "PatientBaselineViewModelPatientId"
+    ],
+    "patient_join_path": [
+      {
+        "constraint": "FK_EegFocalityRecords_Patients_PatientBaselineViewModelPatientId",
+        "child_schema": "dbo",
+        "child_table": "EegFocalityRecords",
+        "parent_schema": "dbo",
+        "parent_table": "Patients",
+        "columns": [
+          {
+            "child": "PatientBaselineViewModelPatientId",
+            "parent": "PatientId"
+          }
+        ]
+      }
+    ],
+    "temporal_columns": [
+      "Date"
+    ],
+    "numeric_columns_to_review": [],
+    "feature_review_flags": {
+      "Id": [
+        "Identifier/join key; exclude from predictors"
+      ],
+      "PatientBaselineViewModelPatientId": [
+        "Identifier/join key; exclude from predictors"
+      ],
+      "Note": [
+        "Free text; review timing and outcome mentions before encoding"
+      ]
+    },
+    "column_profile": [
+      {
+        "column": "Id",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 160
+      },
+      {
+        "column": "Date",
+        "sql_type": "datetime2",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 125
+      },
+      {
+        "column": "Focality",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 105
+      },
+      {
+        "column": "PatientBaselineViewModelPatientId",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 160
+      },
+      {
+        "column": "Note",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 1,
+        "missing_fraction": 0.00625,
+        "distinct_non_null": 159
+      }
+    ]
+  },
+  {
+    "table": "dbo.EegRecords",
+    "schema": "dbo",
+    "name": "EegRecords",
+    "rows": 4599,
+    "columns": 4,
+    "role": "clinical_records",
+    "primary_key": [
+      "Id"
+    ],
+    "foreign_key_columns": [
+      "PatientBaselineViewModelPatientId"
+    ],
+    "patient_join_path": [
+      {
+        "constraint": "FK_EegRecords_Patients_PatientBaselineViewModelPatientId",
+        "child_schema": "dbo",
+        "child_table": "EegRecords",
+        "parent_schema": "dbo",
+        "parent_table": "Patients",
+        "columns": [
+          {
+            "child": "PatientBaselineViewModelPatientId",
+            "parent": "PatientId"
+          }
+        ]
+      }
+    ],
+    "temporal_columns": [
+      "Date"
+    ],
+    "numeric_columns_to_review": [],
+    "feature_review_flags": {
+      "Id": [
+        "Identifier/join key; exclude from predictors"
+      ],
+      "Note": [
+        "Free text; review timing and outcome mentions before encoding"
+      ],
+      "PatientBaselineViewModelPatientId": [
+        "Identifier/join key; exclude from predictors"
+      ]
+    },
+    "column_profile": [
+      {
+        "column": "Id",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 4599
+      },
+      {
+        "column": "Date",
+        "sql_type": "datetime2",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 3118
+      },
+      {
+        "column": "Note",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 4448
+      },
+      {
+        "column": "PatientBaselineViewModelPatientId",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 264
+      }
+    ]
+  },
+  {
+    "table": "dbo.EtiologySettings",
+    "schema": "dbo",
+    "name": "EtiologySettings",
+    "rows": 14,
+    "columns": 2,
+    "role": "lookup_settings",
+    "primary_key": [
+      "Id"
+    ],
+    "foreign_key_columns": [],
+    "patient_join_path": null,
+    "temporal_columns": [],
+    "numeric_columns_to_review": [],
+    "feature_review_flags": {
+      "Id": [
+        "Identifier/join key; exclude from predictors"
+      ]
+    },
+    "column_profile": [
+      {
+        "column": "Id",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 14
+      },
+      {
+        "column": "Name",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 14
+      }
+    ]
+  },
+  {
+    "table": "dbo.HematologyItemSettings",
+    "schema": "dbo",
+    "name": "HematologyItemSettings",
+    "rows": 21,
+    "columns": 6,
+    "role": "lookup_settings",
+    "primary_key": [
+      "Id"
+    ],
+    "foreign_key_columns": [],
+    "patient_join_path": null,
+    "temporal_columns": [],
+    "numeric_columns_to_review": [],
+    "feature_review_flags": {
+      "Id": [
+        "Identifier/join key; exclude from predictors"
+      ]
+    },
+    "column_profile": [
+      {
+        "column": "Id",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 21
+      },
+      {
+        "column": "Name",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 21
+      },
+      {
+        "column": "SortOrder",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 21
+      },
+      {
+        "column": "RefMax",
+        "sql_type": "float",
+        "pandas_dtype": "Float64",
+        "missing_count": 2,
+        "missing_fraction": 0.09523809523809523,
+        "distinct_non_null": 19
+      },
+      {
+        "column": "RefMin",
+        "sql_type": "float",
+        "pandas_dtype": "Float64",
+        "missing_count": 3,
+        "missing_fraction": 0.14285714285714285,
+        "distinct_non_null": 18
+      },
+      {
+        "column": "NormalTextValue",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 21,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      }
+    ]
+  },
+  {
+    "table": "dbo.HematologyRecords",
+    "schema": "dbo",
+    "name": "HematologyRecords",
+    "rows": 1131,
+    "columns": 4,
+    "role": "clinical_records",
+    "primary_key": [
+      "Id"
+    ],
+    "foreign_key_columns": [
+      "PatientBaselineViewModelPatientId"
+    ],
+    "patient_join_path": [
+      {
+        "constraint": "FK_HematologyRecords_Patients_PatientBaselineViewModelPatientId",
+        "child_schema": "dbo",
+        "child_table": "HematologyRecords",
+        "parent_schema": "dbo",
+        "parent_table": "Patients",
+        "columns": [
+          {
+            "child": "PatientBaselineViewModelPatientId",
+            "parent": "PatientId"
+          }
+        ]
+      }
+    ],
+    "temporal_columns": [
+      "Date"
+    ],
+    "numeric_columns_to_review": [],
+    "feature_review_flags": {
+      "Id": [
+        "Identifier/join key; exclude from predictors"
+      ],
+      "PatientBaselineViewModelPatientId": [
+        "Identifier/join key; exclude from predictors"
+      ]
+    },
+    "column_profile": [
+      {
+        "column": "Id",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 1131
+      },
+      {
+        "column": "Date",
+        "sql_type": "datetime2",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 1012
+      },
+      {
+        "column": "DynamicDataJson",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 1115
+      },
+      {
+        "column": "PatientBaselineViewModelPatientId",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 215
+      }
+    ]
+  },
+  {
+    "table": "dbo.HospitalizationRecords",
+    "schema": "dbo",
+    "name": "HospitalizationRecords",
+    "rows": 965,
+    "columns": 7,
+    "role": "clinical_records",
+    "primary_key": [
+      "Id"
+    ],
+    "foreign_key_columns": [
+      "PatientBaselineViewModelPatientId"
+    ],
+    "patient_join_path": [
+      {
+        "constraint": "FK_HospitalizationRecords_Patients_PatientBaselineViewModelPatientId",
+        "child_schema": "dbo",
+        "child_table": "HospitalizationRecords",
+        "parent_schema": "dbo",
+        "parent_table": "Patients",
+        "columns": [
+          {
+            "child": "PatientBaselineViewModelPatientId",
+            "parent": "PatientId"
+          }
+        ]
+      }
+    ],
+    "temporal_columns": [
+      "Date",
+      "EndDate"
+    ],
+    "numeric_columns_to_review": [
+      "IsInpatient",
+      "IsEmergency"
+    ],
+    "feature_review_flags": {
+      "Id": [
+        "Identifier/join key; exclude from predictors"
+      ],
+      "Note": [
+        "Free text; review timing and outcome mentions before encoding"
+      ],
+      "PatientBaselineViewModelPatientId": [
+        "Identifier/join key; exclude from predictors"
+      ]
+    },
+    "column_profile": [
+      {
+        "column": "Id",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 965
+      },
+      {
+        "column": "Date",
+        "sql_type": "datetime2",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 905
+      },
+      {
+        "column": "IsInpatient",
+        "sql_type": "bit",
+        "pandas_dtype": "boolean",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 2
+      },
+      {
+        "column": "IsEmergency",
+        "sql_type": "bit",
+        "pandas_dtype": "boolean",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 2
+      },
+      {
+        "column": "Note",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 1,
+        "missing_fraction": 0.0010362694300518134,
+        "distinct_non_null": 182
+      },
+      {
+        "column": "PatientBaselineViewModelPatientId",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 181
+      },
+      {
+        "column": "EndDate",
+        "sql_type": "datetime2",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 905
+      }
+    ]
+  },
+  {
+    "table": "dbo.ImmunoItemSettings",
+    "schema": "dbo",
+    "name": "ImmunoItemSettings",
+    "rows": 8,
+    "columns": 6,
+    "role": "lookup_settings",
+    "primary_key": [
+      "Id"
+    ],
+    "foreign_key_columns": [],
+    "patient_join_path": null,
+    "temporal_columns": [],
+    "numeric_columns_to_review": [],
+    "feature_review_flags": {
+      "Id": [
+        "Identifier/join key; exclude from predictors"
+      ]
+    },
+    "column_profile": [
+      {
+        "column": "Id",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 8
+      },
+      {
+        "column": "Name",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 8
+      },
+      {
+        "column": "RefMin",
+        "sql_type": "float",
+        "pandas_dtype": "Float64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 8
+      },
+      {
+        "column": "RefMax",
+        "sql_type": "float",
+        "pandas_dtype": "Float64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 8
+      },
+      {
+        "column": "SortOrder",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 8
+      },
+      {
+        "column": "NormalTextValue",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 8,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      }
+    ]
+  },
+  {
+    "table": "dbo.ImmunoRecords",
+    "schema": "dbo",
+    "name": "ImmunoRecords",
+    "rows": 238,
+    "columns": 5,
+    "role": "clinical_records",
+    "primary_key": [
+      "Id"
+    ],
+    "foreign_key_columns": [
+      "PatientBaselineViewModelPatientId"
+    ],
+    "patient_join_path": [
+      {
+        "constraint": "FK_ImmunoRecords_Patients_PatientBaselineViewModelPatientId",
+        "child_schema": "dbo",
+        "child_table": "ImmunoRecords",
+        "parent_schema": "dbo",
+        "parent_table": "Patients",
+        "columns": [
+          {
+            "child": "PatientBaselineViewModelPatientId",
+            "parent": "PatientId"
+          }
+        ]
+      }
+    ],
+    "temporal_columns": [
+      "Date"
+    ],
+    "numeric_columns_to_review": [],
+    "feature_review_flags": {
+      "Id": [
+        "Identifier/join key; exclude from predictors"
+      ],
+      "Note": [
+        "Free text; review timing and outcome mentions before encoding"
+      ],
+      "PatientBaselineViewModelPatientId": [
+        "Identifier/join key; exclude from predictors"
+      ]
+    },
+    "column_profile": [
+      {
+        "column": "Id",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 238
+      },
+      {
+        "column": "Date",
+        "sql_type": "datetime2",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 223
+      },
+      {
+        "column": "DynamicDataJson",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 235
+      },
+      {
+        "column": "Note",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 238,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "PatientBaselineViewModelPatientId",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 127
+      }
+    ]
+  },
+  {
+    "table": "dbo.LabRecords",
+    "schema": "dbo",
+    "name": "LabRecords",
+    "rows": 0,
+    "columns": 6,
+    "role": "clinical_records",
+    "primary_key": [
+      "Id"
+    ],
+    "foreign_key_columns": [
+      "PatientBaselineViewModelPatientId"
+    ],
+    "patient_join_path": [
+      {
+        "constraint": "FK_LabRecords_Patients_PatientBaselineViewModelPatientId",
+        "child_schema": "dbo",
+        "child_table": "LabRecords",
+        "parent_schema": "dbo",
+        "parent_table": "Patients",
+        "columns": [
+          {
+            "child": "PatientBaselineViewModelPatientId",
+            "parent": "PatientId"
+          }
+        ]
+      }
+    ],
+    "temporal_columns": [],
+    "numeric_columns_to_review": [
+      "Value",
+      "RefMin",
+      "RefMax"
+    ],
+    "feature_review_flags": {
+      "Id": [
+        "Identifier/join key; exclude from predictors"
+      ],
+      "PatientBaselineViewModelPatientId": [
+        "Identifier/join key; exclude from predictors"
+      ]
+    },
+    "column_profile": [
+      {
+        "column": "Id",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": null,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "TestItem",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": null,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Value",
+        "sql_type": "float",
+        "pandas_dtype": "Float64",
+        "missing_count": 0,
+        "missing_fraction": null,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "RefMin",
+        "sql_type": "float",
+        "pandas_dtype": "Float64",
+        "missing_count": 0,
+        "missing_fraction": null,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "RefMax",
+        "sql_type": "float",
+        "pandas_dtype": "Float64",
+        "missing_count": 0,
+        "missing_fraction": null,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "PatientBaselineViewModelPatientId",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": null,
+        "distinct_non_null": 0
+      }
+    ]
+  },
+  {
+    "table": "dbo.MmseRecords",
+    "schema": "dbo",
+    "name": "MmseRecords",
+    "rows": 431,
+    "columns": 36,
+    "role": "clinical_records",
+    "primary_key": [
+      "Id"
+    ],
+    "foreign_key_columns": [
+      "PatientBaselineViewModelPatientId"
+    ],
+    "patient_join_path": [
+      {
+        "constraint": "FK_MmseRecords_Patients_PatientBaselineViewModelPatientId",
+        "child_schema": "dbo",
+        "child_table": "MmseRecords",
+        "parent_schema": "dbo",
+        "parent_table": "Patients",
+        "columns": [
+          {
+            "child": "PatientBaselineViewModelPatientId",
+            "parent": "PatientId"
+          }
+        ]
+      }
+    ],
+    "temporal_columns": [
+      "Date"
+    ],
+    "numeric_columns_to_review": [],
+    "feature_review_flags": {
+      "Id": [
+        "Identifier/join key; exclude from predictors"
+      ],
+      "PatientBaselineViewModelPatientId": [
+        "Identifier/join key; exclude from predictors"
+      ]
+    },
+    "column_profile": [
+      {
+        "column": "Id",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 431
+      },
+      {
+        "column": "Date",
+        "sql_type": "datetime2",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 321
+      },
+      {
+        "column": "TotalScore",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 29
+      },
+      {
+        "column": "Q1",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 431,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q2",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 431,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q3",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 431,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q4",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 431,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q5",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 431,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q6",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 431,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q7",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 431,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q8",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 431,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q9",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 431,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q10",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 431,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q11",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 431,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "YR",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 431,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Season",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 431,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "MO",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 431,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "MMSE_DATE",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 431,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "DAY",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 431,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "SPa",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 431,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "SPb",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 431,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "DPT",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 431,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Floor",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 431,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "RC1a",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 431,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "RC1b",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 431,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "RC1c",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 431,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "DBd",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 431,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "SUB",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 431,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "RGS1",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 431,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "OBJa",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 431,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "RPTa",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 431,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "CMD",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 431,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "READa",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 431,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "WRITE",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 431,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "DRAW",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 431,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "PatientBaselineViewModelPatientId",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 205
+      }
+    ]
+  },
+  {
+    "table": "dbo.MonthlyRecords",
+    "schema": "dbo",
+    "name": "MonthlyRecords",
+    "rows": 0,
+    "columns": 8,
+    "role": "clinical_records",
+    "primary_key": [
+      "Id"
+    ],
+    "foreign_key_columns": [
+      "PatientBaselineViewModelPatientId"
+    ],
+    "patient_join_path": [
+      {
+        "constraint": "FK_MonthlyRecords_Patients_PatientBaselineViewModelPatientId",
+        "child_schema": "dbo",
+        "child_table": "MonthlyRecords",
+        "parent_schema": "dbo",
+        "parent_table": "Patients",
+        "columns": [
+          {
+            "child": "PatientBaselineViewModelPatientId",
+            "parent": "PatientId"
+          }
+        ]
+      }
+    ],
+    "temporal_columns": [],
+    "numeric_columns_to_review": [
+      "Year",
+      "Month",
+      "HasSeizure",
+      "HasEEGAbnormal",
+      "HasLab"
+    ],
+    "feature_review_flags": {
+      "Id": [
+        "Identifier/join key; exclude from predictors"
+      ],
+      "VisitNote": [
+        "Free text; review timing and outcome mentions before encoding"
+      ],
+      "PatientBaselineViewModelPatientId": [
+        "Identifier/join key; exclude from predictors"
+      ]
+    },
+    "column_profile": [
+      {
+        "column": "Id",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": null,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Year",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": null,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Month",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": null,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "HasSeizure",
+        "sql_type": "bit",
+        "pandas_dtype": "boolean",
+        "missing_count": 0,
+        "missing_fraction": null,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "HasEEGAbnormal",
+        "sql_type": "bit",
+        "pandas_dtype": "boolean",
+        "missing_count": 0,
+        "missing_fraction": null,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "HasLab",
+        "sql_type": "bit",
+        "pandas_dtype": "boolean",
+        "missing_count": 0,
+        "missing_fraction": null,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "VisitNote",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": null,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "PatientBaselineViewModelPatientId",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": null,
+        "distinct_non_null": 0
+      }
+    ]
+  },
+  {
+    "table": "dbo.PatientMonthlyDreStatus",
+    "schema": "dbo",
+    "name": "PatientMonthlyDreStatus",
+    "rows": 42669,
+    "columns": 19,
+    "role": "derived_labels_and_audit",
+    "primary_key": [
+      "Id"
+    ],
+    "foreign_key_columns": [
+      "PatientId"
+    ],
+    "patient_join_path": [
+      {
+        "constraint": "FK_PatientMonthlyDreStatus_Patients",
+        "child_schema": "dbo",
+        "child_table": "PatientMonthlyDreStatus",
+        "parent_schema": "dbo",
+        "parent_table": "Patients",
+        "columns": [
+          {
+            "child": "PatientId",
+            "parent": "PatientId"
+          }
+        ]
+      }
+    ],
+    "temporal_columns": [
+      "MonthStart",
+      "AssessmentDate",
+      "WindowStart",
+      "AsmRecordDate",
+      "CalculationAsOf",
+      "CalculatedAtUtc"
+    ],
+    "numeric_columns_to_review": [],
+    "feature_review_flags": {
+      "Id": [
+        "Identifier/join key; exclude from predictors",
+        "Outcome or label provenance; do not use as a predictor"
+      ],
+      "PatientId": [
+        "Identifier/join key; exclude from predictors",
+        "Outcome or label provenance; do not use as a predictor"
+      ],
+      "MonthStart": [
+        "Outcome or label provenance; do not use as a predictor"
+      ],
+      "AssessmentDate": [
+        "Outcome or label provenance; do not use as a predictor"
+      ],
+      "WindowStart": [
+        "Outcome or label provenance; do not use as a predictor"
+      ],
+      "IsDRE": [
+        "Outcome or label provenance; do not use as a predictor"
+      ],
+      "AsmCount": [
+        "Outcome or label provenance; do not use as a predictor"
+      ],
+      "AsmRecordId": [
+        "Outcome or label provenance; do not use as a predictor"
+      ],
+      "AsmRecordDate": [
+        "Outcome or label provenance; do not use as a predictor"
+      ],
+      "AsmRecordAgeDays": [
+        "Outcome or label provenance; do not use as a predictor"
+      ],
+      "SeizureCountLowerBound": [
+        "Outcome or label provenance; do not use as a predictor"
+      ],
+      "SeizureCoverageComplete": [
+        "Outcome or label provenance; do not use as a predictor"
+      ],
+      "Reason": [
+        "Outcome or label provenance; do not use as a predictor",
+        "Free text; review timing and outcome mentions before encoding"
+      ],
+      "EvidenceJson": [
+        "Outcome or label provenance; do not use as a predictor"
+      ],
+      "SourceFingerprint": [
+        "Outcome or label provenance; do not use as a predictor"
+      ],
+      "CalculationAsOf": [
+        "Outcome or label provenance; do not use as a predictor"
+      ],
+      "MethodVersion": [
+        "Outcome or label provenance; do not use as a predictor"
+      ],
+      "ContentHash": [
+        "Outcome or label provenance; do not use as a predictor"
+      ],
+      "CalculatedAtUtc": [
+        "Outcome or label provenance; do not use as a predictor"
+      ]
+    },
+    "column_profile": [
+      {
+        "column": "Id",
+        "sql_type": "bigint",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 42669
+      },
+      {
+        "column": "PatientId",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 265
+      },
+      {
+        "column": "MonthStart",
+        "sql_type": "date",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 256
+      },
+      {
+        "column": "AssessmentDate",
+        "sql_type": "date",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 256
+      },
+      {
+        "column": "WindowStart",
+        "sql_type": "date",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 256
+      },
+      {
+        "column": "IsDRE",
+        "sql_type": "bit",
+        "pandas_dtype": "boolean",
+        "missing_count": 9078,
+        "missing_fraction": 0.21275399001617099,
+        "distinct_non_null": 2
+      },
+      {
+        "column": "AsmCount",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 414,
+        "missing_fraction": 0.009702594389369332,
+        "distinct_non_null": 9
+      },
+      {
+        "column": "AsmRecordId",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 240,
+        "missing_fraction": 0.005624692399634395,
+        "distinct_non_null": 42087
+      },
+      {
+        "column": "AsmRecordDate",
+        "sql_type": "date",
+        "pandas_dtype": "string",
+        "missing_count": 240,
+        "missing_fraction": 0.005624692399634395,
+        "distinct_non_null": 4442
+      },
+      {
+        "column": "AsmRecordAgeDays",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 240,
+        "missing_fraction": 0.005624692399634395,
+        "distinct_non_null": 138
+      },
+      {
+        "column": "SeizureCountLowerBound",
+        "sql_type": "bigint",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 234
+      },
+      {
+        "column": "SeizureCoverageComplete",
+        "sql_type": "bit",
+        "pandas_dtype": "boolean",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 2
+      },
+      {
+        "column": "Reason",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 6
+      },
+      {
+        "column": "EvidenceJson",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 24076
+      },
+      {
+        "column": "SourceFingerprint",
+        "sql_type": "char",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 1
+      },
+      {
+        "column": "CalculationAsOf",
+        "sql_type": "date",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 1
+      },
+      {
+        "column": "MethodVersion",
+        "sql_type": "varchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 1
+      },
+      {
+        "column": "ContentHash",
+        "sql_type": "char",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 42669
+      },
+      {
+        "column": "CalculatedAtUtc",
+        "sql_type": "datetime2",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 1
+      }
+    ]
+  },
+  {
+    "table": "dbo.Patients",
+    "schema": "dbo",
+    "name": "Patients",
+    "rows": 265,
+    "columns": 59,
+    "role": "patient_baseline",
+    "primary_key": [
+      "PatientId"
+    ],
+    "foreign_key_columns": [],
+    "patient_join_path": [],
+    "temporal_columns": [
+      "Birthday",
+      "LastUpdatedAt",
+      "LastCallReminderContactedAt",
+      "LastCallReminderVisitDate",
+      "LastCognitiveReminderCompletedAt",
+      "LastCognitiveReminderRecordDate",
+      "LastEegReminderCompletedAt",
+      "LastEegReminderRecordDate",
+      "LastLabReminderCompletedAt",
+      "LastLabReminderRecordDate"
+    ],
+    "numeric_columns_to_review": [
+      "Gender",
+      "FirstSeizureAge",
+      "AgeFirstNckuVisit",
+      "AgeFirstWuVisit",
+      "EpilepsyDiagnosedByWu",
+      "HasOutsideFilm",
+      "HasRecordsBefore2000",
+      "HasPaperChart",
+      "HasAsmAdverse",
+      "HasMentalRetardation",
+      "AsymptomaticIed"
+    ],
+    "feature_review_flags": {
+      "PatientId": [
+        "Identifier/join key; exclude from predictors"
+      ],
+      "FirstSeizureNote": [
+        "Free text; review timing and outcome mentions before encoding"
+      ],
+      "AgeFirstNckuVisitNote": [
+        "Free text; review timing and outcome mentions before encoding"
+      ],
+      "AgeFirstWuVisitNote": [
+        "Free text; review timing and outcome mentions before encoding"
+      ],
+      "Age2026": [
+        "Age at fixed future year; derive age at prediction date instead"
+      ],
+      "LastSeizure": [
+        "Latest-state/workflow field; verify availability at prediction time"
+      ],
+      "IsDRE": [
+        "Outcome or label provenance; do not use as a predictor"
+      ],
+      "DrugRefractoryDetail": [
+        "Outcome or label provenance; do not use as a predictor"
+      ],
+      "HasOutsideFilmNote": [
+        "Free text; review timing and outcome mentions before encoding"
+      ],
+      "EegFocalityNote": [
+        "Free text; review timing and outcome mentions before encoding"
+      ],
+      "EtiologyNote": [
+        "Free text; review timing and outcome mentions before encoding"
+      ],
+      "MentalRetardationNote": [
+        "Free text; review timing and outcome mentions before encoding"
+      ],
+      "ClinicalFeaturesNote": [
+        "Free text; review timing and outcome mentions before encoding"
+      ],
+      "SemiologyNote": [
+        "Free text; review timing and outcome mentions before encoding"
+      ],
+      "IsStableCallReminder": [
+        "Latest-state/workflow field; verify availability at prediction time"
+      ],
+      "DxPlan": [
+        "Free text; review timing and outcome mentions before encoding"
+      ],
+      "Note": [
+        "Free text; review timing and outcome mentions before encoding"
+      ],
+      "SeizureNote": [
+        "Free text; review timing and outcome mentions before encoding"
+      ],
+      "SoapReason": [
+        "Free text; review timing and outcome mentions before encoding"
+      ],
+      "DreStatusDetail": [
+        "Outcome or label provenance; do not use as a predictor"
+      ],
+      "HasPaperChartNote": [
+        "Free text; review timing and outcome mentions before encoding"
+      ],
+      "LastUpdatedAt": [
+        "Latest-state/workflow field; verify availability at prediction time"
+      ],
+      "LastCallReminderContactedAt": [
+        "Latest-state/workflow field; verify availability at prediction time"
+      ],
+      "LastCallReminderVisitDate": [
+        "Latest-state/workflow field; verify availability at prediction time"
+      ],
+      "LastCognitiveReminderCompletedAt": [
+        "Latest-state/workflow field; verify availability at prediction time"
+      ],
+      "LastCognitiveReminderRecordDate": [
+        "Latest-state/workflow field; verify availability at prediction time"
+      ],
+      "LastEegReminderCompletedAt": [
+        "Latest-state/workflow field; verify availability at prediction time"
+      ],
+      "LastEegReminderRecordDate": [
+        "Latest-state/workflow field; verify availability at prediction time"
+      ],
+      "LastLabReminderCompletedAt": [
+        "Latest-state/workflow field; verify availability at prediction time"
+      ],
+      "LastLabReminderRecordDate": [
+        "Latest-state/workflow field; verify availability at prediction time"
+      ],
+      "MedicalRecordNumber": [
+        "Identifier/join key; exclude from predictors"
+      ]
+    },
+    "column_profile": [
+      {
+        "column": "PatientId",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 265
+      },
+      {
+        "column": "Gender",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 2
+      },
+      {
+        "column": "Birthday",
+        "sql_type": "datetime2",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 262
+      },
+      {
+        "column": "FirstSeizureAge",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 40,
+        "missing_fraction": 0.1509433962264151,
+        "distinct_non_null": 64
+      },
+      {
+        "column": "FirstSeizureNote",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 233,
+        "missing_fraction": 0.879245283018868,
+        "distinct_non_null": 32
+      },
+      {
+        "column": "AgeFirstNckuVisit",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 24,
+        "missing_fraction": 0.09056603773584905,
+        "distinct_non_null": 64
+      },
+      {
+        "column": "AgeFirstNckuVisitNote",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 82,
+        "missing_fraction": 0.30943396226415093,
+        "distinct_non_null": 181
+      },
+      {
+        "column": "AgeFirstWuVisit",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 64
+      },
+      {
+        "column": "AgeFirstWuVisitNote",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 9,
+        "missing_fraction": 0.033962264150943396,
+        "distinct_non_null": 149
+      },
+      {
+        "column": "Age2026",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 260,
+        "missing_fraction": 0.9811320754716981,
+        "distinct_non_null": 4
+      },
+      {
+        "column": "EpilepsyDiagnosedByWu",
+        "sql_type": "bit",
+        "pandas_dtype": "boolean",
+        "missing_count": 3,
+        "missing_fraction": 0.011320754716981131,
+        "distinct_non_null": 2
+      },
+      {
+        "column": "LastSeizure",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 1,
+        "missing_fraction": 0.0037735849056603774,
+        "distinct_non_null": 258
+      },
+      {
+        "column": "Occupation",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 54,
+        "missing_fraction": 0.2037735849056604,
+        "distinct_non_null": 181
+      },
+      {
+        "column": "IsDRE",
+        "sql_type": "bit",
+        "pandas_dtype": "boolean",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 2
+      },
+      {
+        "column": "DrugRefractoryDetail",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 265,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "SystemicDisease",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 180
+      },
+      {
+        "column": "NonAsmMedication",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 90
+      },
+      {
+        "column": "DX",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 263
+      },
+      {
+        "column": "HasOutsideFilm",
+        "sql_type": "bit",
+        "pandas_dtype": "boolean",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 1
+      },
+      {
+        "column": "HasOutsideFilmNote",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 265,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "HasRecordsBefore2000",
+        "sql_type": "bit",
+        "pandas_dtype": "boolean",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 2
+      },
+      {
+        "column": "HasPaperChart",
+        "sql_type": "bit",
+        "pandas_dtype": "boolean",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 2
+      },
+      {
+        "column": "HasAsmAdverse",
+        "sql_type": "bit",
+        "pandas_dtype": "boolean",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 2
+      },
+      {
+        "column": "EEGFocality",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 105
+      },
+      {
+        "column": "EegFocalityNote",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 106,
+        "missing_fraction": 0.4,
+        "distinct_non_null": 159
+      },
+      {
+        "column": "Etiologies",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 39
+      },
+      {
+        "column": "EtiologyNote",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 189,
+        "missing_fraction": 0.7132075471698113,
+        "distinct_non_null": 73
+      },
+      {
+        "column": "MentalRetardationItems",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 1
+      },
+      {
+        "column": "MentalRetardation",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 265,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "HasMentalRetardation",
+        "sql_type": "bit",
+        "pandas_dtype": "boolean",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 2
+      },
+      {
+        "column": "MentalRetardationNote",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 245,
+        "missing_fraction": 0.9245283018867925,
+        "distinct_non_null": 13
+      },
+      {
+        "column": "SemiologyDx",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 263
+      },
+      {
+        "column": "SemiologyDetails",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 265,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "SemiologyFrequency",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 8,
+        "missing_fraction": 0.03018867924528302,
+        "distinct_non_null": 250
+      },
+      {
+        "column": "ProvokingFactor",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 232,
+        "missing_fraction": 0.8754716981132076,
+        "distinct_non_null": 33
+      },
+      {
+        "column": "AsymptomaticIed",
+        "sql_type": "bit",
+        "pandas_dtype": "boolean",
+        "missing_count": 235,
+        "missing_fraction": 0.8867924528301887,
+        "distinct_non_null": 2
+      },
+      {
+        "column": "SemiologyDescriptor",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 222,
+        "missing_fraction": 0.8377358490566038,
+        "distinct_non_null": 43
+      },
+      {
+        "column": "SeizureTypes",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 41
+      },
+      {
+        "column": "ClinicalFeatures",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 37
+      },
+      {
+        "column": "ClinicalFeaturesNote",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 197,
+        "missing_fraction": 0.7433962264150943,
+        "distinct_non_null": 58
+      },
+      {
+        "column": "SemiologyNote",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 260,
+        "missing_fraction": 0.9811320754716981,
+        "distinct_non_null": 5
+      },
+      {
+        "column": "IsStableCallReminder",
+        "sql_type": "bit",
+        "pandas_dtype": "boolean",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 2
+      },
+      {
+        "column": "DxPlan",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 6,
+        "missing_fraction": 0.022641509433962263,
+        "distinct_non_null": 259
+      },
+      {
+        "column": "Note",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 265,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "SeizureNote",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 265,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "SoapReason",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 5,
+        "missing_fraction": 0.018867924528301886,
+        "distinct_non_null": 259
+      },
+      {
+        "column": "SemiologyFrequencies",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 258
+      },
+      {
+        "column": "DreStatusDetail",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 11
+      },
+      {
+        "column": "HasPaperChartNote",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 265,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "LastUpdatedAt",
+        "sql_type": "datetimeoffset",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 265
+      },
+      {
+        "column": "LastCallReminderContactedAt",
+        "sql_type": "datetimeoffset",
+        "pandas_dtype": "string",
+        "missing_count": 264,
+        "missing_fraction": 0.9962264150943396,
+        "distinct_non_null": 1
+      },
+      {
+        "column": "LastCallReminderVisitDate",
+        "sql_type": "datetime2",
+        "pandas_dtype": "string",
+        "missing_count": 264,
+        "missing_fraction": 0.9962264150943396,
+        "distinct_non_null": 1
+      },
+      {
+        "column": "LastCognitiveReminderCompletedAt",
+        "sql_type": "datetimeoffset",
+        "pandas_dtype": "string",
+        "missing_count": 265,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "LastCognitiveReminderRecordDate",
+        "sql_type": "datetime2",
+        "pandas_dtype": "string",
+        "missing_count": 265,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "LastEegReminderCompletedAt",
+        "sql_type": "datetimeoffset",
+        "pandas_dtype": "string",
+        "missing_count": 265,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "LastEegReminderRecordDate",
+        "sql_type": "datetime2",
+        "pandas_dtype": "string",
+        "missing_count": 265,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "LastLabReminderCompletedAt",
+        "sql_type": "datetimeoffset",
+        "pandas_dtype": "string",
+        "missing_count": 265,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "LastLabReminderRecordDate",
+        "sql_type": "datetime2",
+        "pandas_dtype": "string",
+        "missing_count": 265,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "MedicalRecordNumber",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 265,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      }
+    ]
+  },
+  {
+    "table": "dbo.PregnancyRecords",
+    "schema": "dbo",
+    "name": "PregnancyRecords",
+    "rows": 116,
+    "columns": 15,
+    "role": "clinical_records",
+    "primary_key": [
+      "Id"
+    ],
+    "foreign_key_columns": [
+      "PatientBaselineViewModelPatientId"
+    ],
+    "patient_join_path": [
+      {
+        "constraint": "FK_PregnancyRecords_Patients_PatientBaselineViewModelPatientId",
+        "child_schema": "dbo",
+        "child_table": "PregnancyRecords",
+        "parent_schema": "dbo",
+        "parent_table": "Patients",
+        "columns": [
+          {
+            "child": "PatientBaselineViewModelPatientId",
+            "parent": "PatientId"
+          }
+        ]
+      }
+    ],
+    "temporal_columns": [
+      "RecordDate"
+    ],
+    "numeric_columns_to_review": [
+      "IsCurrentlyPregnant",
+      "HasObsAbnormality",
+      "PregnancyNumber",
+      "ChildbirthNumber",
+      "InbornErrorOfChild",
+      "DevelopmentalDelay",
+      "SpontaneousAbortion",
+      "ArtificialAbortion",
+      "SeizureFreqT1",
+      "SeizureFreqT2",
+      "SeizureFreqT3"
+    ],
+    "feature_review_flags": {
+      "Id": [
+        "Identifier/join key; exclude from predictors"
+      ],
+      "PatientBaselineViewModelPatientId": [
+        "Identifier/join key; exclude from predictors"
+      ]
+    },
+    "column_profile": [
+      {
+        "column": "Id",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 116
+      },
+      {
+        "column": "RecordDate",
+        "sql_type": "datetime2",
+        "pandas_dtype": "string",
+        "missing_count": 108,
+        "missing_fraction": 0.9310344827586207,
+        "distinct_non_null": 2
+      },
+      {
+        "column": "IsCurrentlyPregnant",
+        "sql_type": "bit",
+        "pandas_dtype": "boolean",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 1
+      },
+      {
+        "column": "HasObsAbnormality",
+        "sql_type": "bit",
+        "pandas_dtype": "boolean",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 1
+      },
+      {
+        "column": "PregnancyNumber",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 46,
+        "missing_fraction": 0.39655172413793105,
+        "distinct_non_null": 4
+      },
+      {
+        "column": "ChildbirthNumber",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 46,
+        "missing_fraction": 0.39655172413793105,
+        "distinct_non_null": 4
+      },
+      {
+        "column": "InbornErrorOfChild",
+        "sql_type": "bit",
+        "pandas_dtype": "boolean",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 1
+      },
+      {
+        "column": "DevelopmentalDelay",
+        "sql_type": "bit",
+        "pandas_dtype": "boolean",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 1
+      },
+      {
+        "column": "SpontaneousAbortion",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 108,
+        "missing_fraction": 0.9310344827586207,
+        "distinct_non_null": 2
+      },
+      {
+        "column": "ArtificialAbortion",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 108,
+        "missing_fraction": 0.9310344827586207,
+        "distinct_non_null": 1
+      },
+      {
+        "column": "SeizureFreqT1",
+        "sql_type": "float",
+        "pandas_dtype": "Float64",
+        "missing_count": 116,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "SeizureFreqT2",
+        "sql_type": "float",
+        "pandas_dtype": "Float64",
+        "missing_count": 116,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "SeizureFreqT3",
+        "sql_type": "float",
+        "pandas_dtype": "Float64",
+        "missing_count": 116,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "FrequencyChange",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 116,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "PatientBaselineViewModelPatientId",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 116
+      }
+    ]
+  },
+  {
+    "table": "dbo.SeizureEventViewModel",
+    "schema": "dbo",
+    "name": "SeizureEventViewModel",
+    "rows": 22600,
+    "columns": 10,
+    "role": "clinical_records",
+    "primary_key": [
+      "Id"
+    ],
+    "foreign_key_columns": [
+      "AsmRecordViewModelId",
+      "PatientBaselineViewModelPatientId"
+    ],
+    "patient_join_path": [
+      {
+        "constraint": "FK_SeizureEventViewModel_Patients_PatientBaselineViewModelPatientId",
+        "child_schema": "dbo",
+        "child_table": "SeizureEventViewModel",
+        "parent_schema": "dbo",
+        "parent_table": "Patients",
+        "columns": [
+          {
+            "child": "PatientBaselineViewModelPatientId",
+            "parent": "PatientId"
+          }
+        ]
+      }
+    ],
+    "temporal_columns": [],
+    "numeric_columns_to_review": [
+      "SeizureCount",
+      "HasVideo"
+    ],
+    "feature_review_flags": {
+      "Id": [
+        "Identifier/join key; exclude from predictors"
+      ],
+      "Description": [
+        "Free text; review timing and outcome mentions before encoding"
+      ],
+      "AsmRecordViewModelId": [
+        "Identifier/join key; exclude from predictors"
+      ],
+      "PatientBaselineViewModelPatientId": [
+        "Identifier/join key; exclude from predictors"
+      ]
+    },
+    "column_profile": [
+      {
+        "column": "Id",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 22600
+      },
+      {
+        "column": "DateString",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 145
+      },
+      {
+        "column": "SeizureCount",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 176,
+        "missing_fraction": 0.007787610619469027,
+        "distinct_non_null": 61
+      },
+      {
+        "column": "TimeOfDay",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 22600,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Description",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 270,
+        "missing_fraction": 0.011946902654867256,
+        "distinct_non_null": 3
+      },
+      {
+        "column": "HasVideo",
+        "sql_type": "bit",
+        "pandas_dtype": "boolean",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 1
+      },
+      {
+        "column": "AsmRecordViewModelId",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 22600,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "PatientBaselineViewModelPatientId",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 263
+      },
+      {
+        "column": "RecordType",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 1
+      },
+      {
+        "column": "EndDateString",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 138
+      }
+    ]
+  },
+  {
+    "table": "dbo.WaisRecords",
+    "schema": "dbo",
+    "name": "WaisRecords",
+    "rows": 1,
+    "columns": 18,
+    "role": "clinical_records",
+    "primary_key": [
+      "Id"
+    ],
+    "foreign_key_columns": [
+      "PatientBaselineViewModelPatientId"
+    ],
+    "patient_join_path": [
+      {
+        "constraint": "FK_WaisRecords_Patients_PatientBaselineViewModelPatientId",
+        "child_schema": "dbo",
+        "child_table": "WaisRecords",
+        "parent_schema": "dbo",
+        "parent_table": "Patients",
+        "columns": [
+          {
+            "child": "PatientBaselineViewModelPatientId",
+            "parent": "PatientId"
+          }
+        ]
+      }
+    ],
+    "temporal_columns": [
+      "Date"
+    ],
+    "numeric_columns_to_review": [],
+    "feature_review_flags": {
+      "Id": [
+        "Identifier/join key; exclude from predictors"
+      ],
+      "PatientBaselineViewModelPatientId": [
+        "Identifier/join key; exclude from predictors"
+      ]
+    },
+    "column_profile": [
+      {
+        "column": "Id",
+        "sql_type": "int",
+        "pandas_dtype": "Int64",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 1
+      },
+      {
+        "column": "Date",
+        "sql_type": "datetime2",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 1
+      },
+      {
+        "column": "Q1",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 1
+      },
+      {
+        "column": "Q2",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 1
+      },
+      {
+        "column": "Q3",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 1
+      },
+      {
+        "column": "Q4",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 1
+      },
+      {
+        "column": "Q5",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 1
+      },
+      {
+        "column": "Q6",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 1
+      },
+      {
+        "column": "Q7",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 1
+      },
+      {
+        "column": "Q8",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 1
+      },
+      {
+        "column": "Q9",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 1
+      },
+      {
+        "column": "Q10",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 1,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q11",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 1,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q12",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 1,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q13",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 1,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "Q14",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 1,
+        "missing_fraction": 1.0,
+        "distinct_non_null": 0
+      },
+      {
+        "column": "PatientBaselineViewModelPatientId",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 1
+      },
+      {
+        "column": "TotalScore",
+        "sql_type": "nvarchar",
+        "pandas_dtype": "string",
+        "missing_count": 0,
+        "missing_fraction": 0.0,
+        "distinct_non_null": 1
+      }
+    ]
+  }
+]

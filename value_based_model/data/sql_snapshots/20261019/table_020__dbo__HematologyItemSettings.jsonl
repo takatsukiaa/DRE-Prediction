@@ -1,0 +1,21 @@
+{"Id":2,"Name":"WBC (10^3/uL)","SortOrder":0,"RefMax":9.5,"RefMin":3.4,"NormalTextValue":null}
+{"Id":3,"Name":"RBC (10^3/uL)","SortOrder":1,"RefMax":5.78,"RefMin":4.26,"NormalTextValue":null}
+{"Id":4,"Name":"Hb (g/uL)","SortOrder":2,"RefMax":17.2,"RefMin":13.3,"NormalTextValue":null}
+{"Id":5,"Name":"Hct (%)","SortOrder":3,"RefMax":50.2,"RefMin":39.1,"NormalTextValue":null}
+{"Id":6,"Name":"MCV (%)","SortOrder":4,"RefMax":98.4,"RefMin":81.9,"NormalTextValue":null}
+{"Id":7,"Name":"MCH (pg)","SortOrder":5,"RefMax":33.7,"RefMin":27.5,"NormalTextValue":null}
+{"Id":8,"Name":"MCHC (g/dL)","SortOrder":6,"RefMax":35.4,"RefMin":32.8,"NormalTextValue":null}
+{"Id":9,"Name":"RDW (%)","SortOrder":7,"RefMax":14.6,"RefMin":12.0,"NormalTextValue":null}
+{"Id":10,"Name":"Plt (10^3/uL)","SortOrder":8,"RefMax":349.0,"RefMin":143.0,"NormalTextValue":null}
+{"Id":11,"Name":"MPV (fL)","SortOrder":9,"RefMax":10.2,"RefMin":6.8,"NormalTextValue":null}
+{"Id":12,"Name":"Seg (%)","SortOrder":10,"RefMax":76.6,"RefMin":40.8,"NormalTextValue":null}
+{"Id":13,"Name":"Eos (%)","SortOrder":11,"RefMax":7.5,"RefMin":0.4,"NormalTextValue":null}
+{"Id":14,"Name":"Baso (%)","SortOrder":12,"RefMax":1.7,"RefMin":0.2,"NormalTextValue":null}
+{"Id":15,"Name":"Mono (%)","SortOrder":13,"RefMax":11.8,"RefMin":4.4,"NormalTextValue":null}
+{"Id":16,"Name":"Lymph (%)","SortOrder":14,"RefMax":47.0,"RefMin":15.4,"NormalTextValue":null}
+{"Id":17,"Name":"MDWW","SortOrder":16,"RefMax":20.0,"RefMin":null,"NormalTextValue":null}
+{"Id":18,"Name":"APTT (secs)","SortOrder":15,"RefMax":40.1,"RefMin":29.3,"NormalTextValue":null}
+{"Id":19,"Name":"PT (secs)","SortOrder":18,"RefMax":12.5,"RefMin":9.4,"NormalTextValue":null}
+{"Id":20,"Name":"PT (INR)","SortOrder":20,"RefMax":1.2,"RefMin":0.8,"NormalTextValue":null}
+{"Id":23,"Name":"MANAPTT (secs)","SortOrder":17,"RefMax":null,"RefMin":null,"NormalTextValue":null}
+{"Id":24,"Name":"PT (MNPT) (secs)","SortOrder":19,"RefMax":null,"RefMin":null,"NormalTextValue":null}

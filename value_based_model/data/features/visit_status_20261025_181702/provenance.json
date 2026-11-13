@@ -1,0 +1,26 @@
+{
+  "snapshot": "C:\\Users\\user\\Desktop\\Epilepsy\\DRE_Prediction\\value based model\\data\\sql_snapshots\\20261019",
+  "snapshot_manifest_sha256": "d9ecf2433ab03b092eb36a14c584eab48d630c96c65ff32c0d9923eeafb75afb",
+  "split_generation": {
+    "method": "seeded shuffle of sorted snapshot patient IDs; no outcome stratification",
+    "seed": 42,
+    "train_patients": 132,
+    "test_patients": 133
+  },
+  "target_definition": "DRE status documented at a medication visit: at least two concurrent scheduled ASMs and positive seizure evidence in (visit minus 12 calendar months, visit]; existing three-valued rules. If visit status is unknown, use the latest monthly assessment strictly before the visit only when that assessment is known; do not skip unknown months.",
+  "feature_schema": "recorded_counts_actual_visits_v2",
+  "target_seizure_window_months": 12,
+  "history_anchor_months": 12,
+  "predictor_timing": "[visit minus 12 months, visit minus (12 minus history months)); availability must precede window end",
+  "code_sha256": {
+    "value based model/build_visit_status.py": "0dec03b2a1910d504def844faec336e12b4046730f1d4d51fd95d40b9595d32e",
+    "value based model/feature_schema.py": "8ec2dafb9f41c7c8cc15369fc14c287fec5a532314191bf43b729cd754f3612e",
+    "value based model/visit_status_targets.py": "2620f2b3aa839c4cbe88a4604f5b24a9a4eca502c942be5c39a0484efb5f1f73",
+    "value based model/longitudinal_features.py": "df72276cca1a13a17e6c3c77eac9b7cf505a4d7ab625661ae33701569db096d3",
+    "value based model/eeg_features.py": "e25341df32a181d6d6f316e906b4a3b3a5428f7e3f5e21310bf82d4f3d1d9252",
+    "value based model/sql_snapshot.py": "0004b772c7238b1fc42a3a4fe0d475447eee2889f92d41300fd8fbe2fab7be1d",
+    "Database/dre_onset_analysis/monthly_dre.py": "b34728ee0d2c64046c76aa892f133b4e498fdb9f22b9e9eda222144500c44874",
+    "Database/dre_onset_analysis/analyze_onset.py": "3fb00d0c9427992ad770c13f1e156dbd8e67bce09be07ab351ad466119a7cfb0",
+    "docx_parsers/docx_parser_eeg_timeline.py": "dbf75727ae2218d50fb40b0865c35890ad03b183ee1883f8808e3be8dbdef0e5"
+  }
+}

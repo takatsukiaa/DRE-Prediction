@@ -1,0 +1,4 @@
+{"Id":1,"Name":"CBZ (ug/mL)","SortOrder":1,"RefMax":12.0,"RefMin":4.0,"NormalTextValue":null}
+{"Id":2,"Name":"PTN (ug/mL)","SortOrder":2,"RefMax":20.0,"RefMin":10.0,"NormalTextValue":null}
+{"Id":3,"Name":"VALP (ug/mL)","SortOrder":3,"RefMax":100.0,"RefMin":50.0,"NormalTextValue":null}
+{"Id":4,"Name":"PHNO (ug/mL)","SortOrder":4,"RefMax":40.0,"RefMin":15.0,"NormalTextValue":null}

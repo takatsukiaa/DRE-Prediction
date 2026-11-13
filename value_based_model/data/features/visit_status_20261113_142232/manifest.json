@@ -1,0 +1,67 @@
+{
+  "format_version": 3,
+  "task": "visit_status",
+  "feature_schema": "recorded_counts_actual_visits_v2",
+  "history_windows_months": [
+    3,
+    6,
+    9
+  ],
+  "history_anchor_months": 12,
+  "rows": 43581,
+  "windows": {
+    "3m": {
+      "features": 784,
+      "visits": 43581,
+      "start_months_before_prediction": 12,
+      "end_months_before_prediction": 9
+    },
+    "6m": {
+      "features": 816,
+      "visits": 43581,
+      "start_months_before_prediction": 12,
+      "end_months_before_prediction": 6
+    },
+    "9m": {
+      "features": 857,
+      "visits": 43581,
+      "start_months_before_prediction": 12,
+      "end_months_before_prediction": 3
+    }
+  },
+  "label_counts": {
+    "train": {
+      "visits": 21810,
+      "dre": 2375,
+      "ndre": 15749,
+      "unknown": 3686
+    },
+    "test": {
+      "visits": 21771,
+      "dre": 3672,
+      "ndre": 12816,
+      "unknown": 5283
+    }
+  },
+  "temporal_holdout": {
+    "months": 12,
+    "start_inclusive": "2025-10-19",
+    "end_inclusive": "2026-10-19"
+  },
+  "files": {
+    "audit_3m.json": "00891826870c12c156aae015acb073e409bb91fdaec69486943c6706767d1762",
+    "audit_6m.json": "985cb4029de795e6fdb4846284a662dca834cb8784f7ea6d010da94a2c4026bb",
+    "audit_9m.json": "89aa74c9767493f64cb7daf43d118b97f21ab8b6a04fbd7b08bffd87190133e0",
+    "eeg_report_audit.jsonl": "192a52ed018ba3634f2e38b2a6e9883a3c05a6e5c74e868be83ae725ae3c99aa",
+    "feature_dictionary_3m.json": "ae345216d723a2d2f137956f773109bbb1b28cd7e6391428356f7b81a6ce7915",
+    "feature_dictionary_6m.json": "c5b2b1a542be40319c91ddedd17fd85da96783722fe1cfce6a161949e03bf9ed",
+    "feature_dictionary_9m.json": "1a82b69bb07a0ca1ae30b5013a4e4924b64198996d450999201232b8b812fa3d",
+    "features_3m.pkl.gz": "740300918ff2bf46df53c6e0579972c190ad22f296be191782e08ec9c94e01a0",
+    "features_6m.pkl.gz": "b06e36faf182f5f9533211904c7494d9f7c58810374e636d15cf649b1a8cb01e",
+    "features_9m.pkl.gz": "285e281462648c8f7a9c23a5dd70952f9a43432303b3c88caeda80e97fc83775",
+    "patient_split.json": "ce801b5fb0d82c9cf9d76b3bbfebb38f8db3a7b0bd9188e6f5a841b5a4924525",
+    "provenance.json": "c21e9e9ed4ee6595cfa5c1bc9763766d37a5bc2e42ca2b88438e73c58f93e07c",
+    "status_targets.jsonl": "713e00fd76294fb82c8f659f43b7d0eb20ad3cd9be335ff7dbc6b8bc6d00327f",
+    "visits.jsonl": "65a82d64996ec75828a18b2b2199bcba72408d8ce4713ef485c7fde360ac51db"
+  }
+}

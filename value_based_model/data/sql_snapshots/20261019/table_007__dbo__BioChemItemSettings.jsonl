@@ -1,0 +1,56 @@
+{"Id":1,"Name":"K","SortOrder":14,"RefMax":5.1,"RefMin":3.5,"NormalTextValue":null}
+{"Id":2,"Name":"Na","SortOrder":13,"RefMax":145.0,"RefMin":136.0,"NormalTextValue":null}
+{"Id":3,"Name":"Ca","SortOrder":15,"RefMax":10.0,"RefMin":8.6,"NormalTextValue":null}
+{"Id":4,"Name":"P","SortOrder":16,"RefMax":4.5,"RefMin":2.5,"NormalTextValue":null}
+{"Id":5,"Name":"Mg","SortOrder":17,"RefMax":2.6,"RefMin":1.6,"NormalTextValue":null}
+{"Id":6,"Name":"CO2","SortOrder":18,"RefMax":29.0,"RefMin":22.0,"NormalTextValue":null}
+{"Id":7,"Name":"OSMO","SortOrder":19,"RefMax":295.0,"RefMin":275.0,"NormalTextValue":null}
+{"Id":8,"Name":"Cl","SortOrder":20,"RefMax":107.0,"RefMin":98.0,"NormalTextValue":null}
+{"Id":9,"Name":"FOL","SortOrder":21,"RefMax":26.8,"RefMin":3.89,"NormalTextValue":null}
+{"Id":10,"Name":"VITB12","SortOrder":22,"RefMax":771.0,"RefMin":197.0,"NormalTextValue":null}
+{"Id":11,"Name":"IRON","SortOrder":23,"RefMax":419.0,"RefMin":245.0,"NormalTextValue":null}
+{"Id":12,"Name":"FERR","SortOrder":24,"RefMax":400.0,"RefMin":30.0,"NormalTextValue":null}
+{"Id":13,"Name":"BUN (mg/dL)","SortOrder":1,"RefMax":20.0,"RefMin":6.0,"NormalTextValue":null}
+{"Id":14,"Name":"CREA (mg/dL)","SortOrder":2,"RefMax":1.2,"RefMin":0.7,"NormalTextValue":null}
+{"Id":15,"Name":"eGFR (CKD-EPI)","SortOrder":3,"RefMax":null,"RefMin":60.0,"NormalTextValue":null}
+{"Id":16,"Name":"eGFR","SortOrder":4,"RefMax":null,"RefMin":60.0,"NormalTextValue":null}
+{"Id":17,"Name":"AST (U/L)","SortOrder":5,"RefMax":50.0,"RefMin":10.0,"NormalTextValue":null}
+{"Id":18,"Name":"ALT (U/L)","SortOrder":6,"RefMax":50.0,"RefMin":null,"NormalTextValue":null}
+{"Id":19,"Name":"ALP","SortOrder":25,"RefMax":129.0,"RefMin":40.0,"NormalTextValue":null}
+{"Id":20,"Name":"ALB","SortOrder":26,"RefMax":5.2,"RefMin":3.5,"NormalTextValue":null}
+{"Id":21,"Name":"AMMONIA","SortOrder":27,"RefMax":51.0,"RefMin":11.0,"NormalTextValue":null}
+{"Id":22,"Name":"BIL-T","SortOrder":28,"RefMax":1.2,"RefMin":null,"NormalTextValue":null}
+{"Id":23,"Name":"BIL-D","SortOrder":29,"RefMax":0.2,"RefMin":null,"NormalTextValue":null}
+{"Id":24,"Name":"GGT","SortOrder":30,"RefMax":71.0,"RefMin":10.0,"NormalTextValue":null}
+{"Id":25,"Name":"CHOL (mg/dL)","SortOrder":7,"RefMax":199.0,"RefMin":null,"NormalTextValue":null}
+{"Id":26,"Name":"HDL-C (mg/dL)","SortOrder":8,"RefMax":5.9,"RefMin":4.8,"NormalTextValue":null}
+{"Id":27,"Name":"LDL-C (mg/dL)","SortOrder":9,"RefMax":99.0,"RefMin":null,"NormalTextValue":null}
+{"Id":28,"Name":"TG (mg/dL)","SortOrder":10,"RefMax":149.0,"RefMin":null,"NormalTextValue":null}
+{"Id":29,"Name":"TP","SortOrder":31,"RefMax":8.3,"RefMin":6.4,"NormalTextValue":null}
+{"Id":30,"Name":"GLU 1hPC","SortOrder":32,"RefMax":140.0,"RefMin":80.0,"NormalTextValue":null}
+{"Id":31,"Name":"GLU, AC (mg/dL)","SortOrder":11,"RefMax":99.0,"RefMin":60.0,"NormalTextValue":null}
+{"Id":32,"Name":"CK","SortOrder":33,"RefMax":308.0,"RefMin":39.0,"NormalTextValue":null}
+{"Id":33,"Name":"GLU, random (mg/dL)","SortOrder":34,"RefMax":139.0,"RefMin":null,"NormalTextValue":null}
+{"Id":34,"Name":"NTproBNP","SortOrder":35,"RefMax":124.0,"RefMin":null,"NormalTextValue":null}
+{"Id":35,"Name":"URIC","SortOrder":36,"RefMax":7.0,"RefMin":3.4,"NormalTextValue":null}
+{"Id":36,"Name":"HBs Ag","SortOrder":37,"RefMax":0.04,"RefMin":null,"NormalTextValue":"Negative, -, Non-reactive"}
+{"Id":37,"Name":"HBs Ab","SortOrder":38,"RefMax":9.0,"RefMin":null,"NormalTextValue":"Negative, -, Non-reactive"}
+{"Id":38,"Name":"HCV Ab","SortOrder":39,"RefMax":null,"RefMin":null,"NormalTextValue":"Non-reactive"}
+{"Id":39,"Name":"Anti-Hbe","SortOrder":40,"RefMax":9.0,"RefMin":null,"NormalTextValue":"Negative, -, Non-reactive"}
+{"Id":40,"Name":"Hbe Ag","SortOrder":41,"RefMax":9.0,"RefMin":null,"NormalTextValue":"Negative, -, Non-reactive"}
+{"Id":41,"Name":"HbA1c (%)","SortOrder":12,"RefMax":5.9,"RefMin":4.8,"NormalTextValue":null}
+{"Id":42,"Name":"IGF-1","SortOrder":42,"RefMax":234.0,"RefMin":96.5,"NormalTextValue":null}
+{"Id":43,"Name":"CA 125","SortOrder":43,"RefMax":34.0,"RefMin":null,"NormalTextValue":null}
+{"Id":44,"Name":"CA 199","SortOrder":44,"RefMax":34.0,"RefMin":0.0,"NormalTextValue":null}
+{"Id":45,"Name":"CRP","SortOrder":45,"RefMax":8.0,"RefMin":0.0,"NormalTextValue":null}
+{"Id":46,"Name":"PSA","SortOrder":46,"RefMax":4.0,"RefMin":0.0,"NormalTextValue":null}
+{"Id":47,"Name":"PIVKA-II","SortOrder":47,"RefMax":27.8,"RefMin":9.1,"NormalTextValue":null}
+{"Id":48,"Name":"ToxoplasmaAb IgG","SortOrder":48,"RefMax":null,"RefMin":null,"NormalTextValue":"Non-reactive"}
+{"Id":49,"Name":"HIV screening test","SortOrder":49,"RefMax":null,"RefMin":null,"NormalTextValue":"Negative"}
+{"Id":50,"Name":"LH","SortOrder":50,"RefMax":8.6,"RefMin":1.7,"NormalTextValue":null}
+{"Id":51,"Name":"TESTO","SortOrder":51,"RefMax":836.0,"RefMin":249.0,"NormalTextValue":null}
+{"Id":52,"Name":"hs-cTnT","SortOrder":52,"RefMax":13.0,"RefMin":null,"NormalTextValue":null}
+{"Id":53,"Name":"Microsomal Ab","SortOrder":53,"RefMax":33.0,"RefMin":null,"NormalTextValue":null}
+{"Id":54,"Name":"Throyroglobulin Ab","SortOrder":54,"RefMax":114.0,"RefMin":null,"NormalTextValue":null}
+{"Id":55,"Name":"LIPASE","SortOrder":55,"RefMax":60.0,"RefMin":13.0,"NormalTextValue":null}
+{"Id":56,"Name":"(U/L)","SortOrder":0,"RefMax":null,"RefMin":null,"NormalTextValue":null}

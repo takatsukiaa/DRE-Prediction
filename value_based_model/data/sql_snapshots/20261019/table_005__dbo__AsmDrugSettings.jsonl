@@ -1,0 +1,15 @@
+{"Id":1,"ActiveSubstance":"Lamotrigine","WhoDddValue":300.0,"DrugLabel":"Lamictal 50mg/tab","MgPerUnit":50.0,"DefaultUnit":"顆"}
+{"Id":2,"ActiveSubstance":"Pregabalin","WhoDddValue":300.0,"DrugLabel":"Lyrica 75mg/cap","MgPerUnit":75.0,"DefaultUnit":"顆"}
+{"Id":3,"ActiveSubstance":"Topiramate","WhoDddValue":300.0,"DrugLabel":"Topamax 100mg/tab","MgPerUnit":100.0,"DefaultUnit":"顆"}
+{"Id":4,"ActiveSubstance":"Perampanel","WhoDddValue":8.0,"DrugLabel":"Fycompa 2mg/tab","MgPerUnit":2.0,"DefaultUnit":"顆"}
+{"Id":5,"ActiveSubstance":"Levetiracetam","WhoDddValue":1500.0,"DrugLabel":"Keppra 500mg/tab","MgPerUnit":500.0,"DefaultUnit":"顆"}
+{"Id":6,"ActiveSubstance":"Oxcarbazepine","WhoDddValue":1000.0,"DrugLabel":"Trileptal 300mg/tab","MgPerUnit":300.0,"DefaultUnit":"顆"}
+{"Id":7,"ActiveSubstance":"Valproate","WhoDddValue":1500.0,"DrugLabel":"Depakine 500mg/tab","MgPerUnit":500.0,"DefaultUnit":"顆"}
+{"Id":8,"ActiveSubstance":"Clobazam","WhoDddValue":20.0,"DrugLabel":"Frisium 10mg/tab","MgPerUnit":10.0,"DefaultUnit":"顆"}
+{"Id":9,"ActiveSubstance":"Lacosamide","WhoDddValue":300.0,"DrugLabel":"Vimpat 100mg/tab","MgPerUnit":100.0,"DefaultUnit":"顆"}
+{"Id":10,"ActiveSubstance":"Zonisamide","WhoDddValue":200.0,"DrugLabel":"Zonegran 100mg/tab","MgPerUnit":100.0,"DefaultUnit":"顆"}
+{"Id":11,"ActiveSubstance":"Carbamazepine","WhoDddValue":1000.0,"DrugLabel":"Carpine 200mg/tab","MgPerUnit":200.0,"DefaultUnit":"顆"}
+{"Id":12,"ActiveSubstance":"Clonazepam","WhoDddValue":8.0,"DrugLabel":"Aclonax 0.5mg/tab","MgPerUnit":0.5,"DefaultUnit":"顆"}
+{"Id":13,"ActiveSubstance":"Phenytoin","WhoDddValue":300.0,"DrugLabel":"Dilantin 100mg/cap","MgPerUnit":100.0,"DefaultUnit":"顆"}
+{"Id":14,"ActiveSubstance":"Phenobarbital","WhoDddValue":100.0,"DrugLabel":"Phenobarbital 30mg/tab","MgPerUnit":30.0,"DefaultUnit":"顆"}
+{"Id":15,"ActiveSubstance":"Risperidone","WhoDddValue":5.0,"DrugLabel":"Risperdal 1mg/tab","MgPerUnit":1.0,"DefaultUnit":"顆"}

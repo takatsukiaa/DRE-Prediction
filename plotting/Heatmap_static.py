@@ -1,11 +1,10 @@
 import os
-import csv
-import pandas as pd
+from pathlib import Path
+import sys
+
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-import numpy as np
 import re
-import docx_parser_static
 from tkinter.filedialog import askopenfilename
 from tkinter import Tk
 
@@ -111,46 +110,58 @@ def plot_seizure_type_checklist(ax, focal_info_str):
         ax.text(x_pos + 0.05, y_pos, code, fontsize=12, va="center",
                 fontweight="bold" if is_active else "normal")
 
+def main():
+    parser_dir = str(Path(__file__).resolve().parents[1] / "docx_parsers")
+    if parser_dir not in sys.path:
+        sys.path.insert(0, parser_dir)
+    from docx_parser_static import initial_table_selection
 
-root = Tk()
-root.withdraw()
-file_path = askopenfilename(
-    title="Select Patient Docx File (Cancel to Exit)",
-    filetypes=[("Docx files", "*.Docx"), ("All files", "*.*")]
-)
-static_data = docx_parser_static.initial_table_selection(file_path)
+    root = Tk()
+    root.withdraw()
+    file_path = askopenfilename(
+        title="Select Patient Docx File (Cancel to Exit)",
+        filetypes=[("Docx files", "*.Docx"), ("All files", "*.*")]
+    )
+    root.destroy()
+    if not file_path:
+        return
+    static_data = initial_table_selection(file_path)
 
-fig_static = plt.figure(figsize=(10, 24), dpi=DPI)
+    fig_static = plt.figure(figsize=(10, 24), dpi=DPI)
 
-# 2. Section 1: Patient Metadata (Top 20%)
-ax_meta_static = fig_static.add_axes([0.1, 0.78, 0.8, 0.18])  # [left, bottom, width, height]
-ax_meta_static.axis("off")
-ax_meta_static.set_xlim(0, 1)
+    # 2. Section 1: Patient Metadata (Top 20%)
+    ax_meta_static = fig_static.add_axes([0.1, 0.78, 0.8, 0.18])  # [left, bottom, width, height]
+    ax_meta_static.axis("off")
+    ax_meta_static.set_xlim(0, 1)
 
-y_ptr = 0.95
-ax_meta_static.text(0, y_ptr, "Patient Information", fontsize=24, fontweight="bold")
-y_ptr -= 0.12
+    y_ptr = 0.95
+    ax_meta_static.text(0, y_ptr, "Patient Information", fontsize=24, fontweight="bold")
+    y_ptr -= 0.12
 
-for k, v in static_data.items():
-    if k!= "Etiology" and k!= "Focal" and k!= "EEG Focality":
-        ax_meta_static.text(0, y_ptr, f"{k}:  {v}", fontsize=15)
-        y_ptr -= 0.08
+    for k, v in static_data.items():
+        if k!= "Etiology" and k!= "Focal" and k!= "EEG Focality":
+            ax_meta_static.text(0, y_ptr, f"{k}:  {v}", fontsize=15)
+            y_ptr -= 0.08
 
-ax_eti_static = fig_static.add_axes([0.1, 0.50, 0.8, 0.25])
-active_eti_codes = static_data["Etiology"].split(',')
-for i in range(len(active_eti_codes)):
-    active_eti_codes[i] = int(active_eti_codes[i])
-plot_etiology_checklist_horizontal(ax_eti_static, active_eti_codes)
+    ax_eti_static = fig_static.add_axes([0.1, 0.50, 0.8, 0.25])
+    active_eti_codes = static_data["Etiology"].split(',')
+    for i in range(len(active_eti_codes)):
+        active_eti_codes[i] = int(active_eti_codes[i])
+    plot_etiology_checklist_horizontal(ax_eti_static, active_eti_codes)
 
-ax_focal_static = fig_static.add_axes([0.1, 0.38, 0.8, 0.10])
-plot_seizure_type_checklist(ax_focal_static, static_data["Focal"])
+    ax_focal_static = fig_static.add_axes([0.1, 0.38, 0.8, 0.10])
+    plot_seizure_type_checklist(ax_focal_static, static_data["Focal"])
 
-ax_eeg_static = fig_static.add_axes([0.1, 0.05, 0.8, 0.33])
-plot_eeg_focality_checklist(ax_eeg_static, static_data["EEG Focality"])
+    ax_eeg_static = fig_static.add_axes([0.1, 0.05, 0.8, 0.33])
+    plot_eeg_focality_checklist(ax_eeg_static, static_data["EEG Focality"])
 
-file_path = os.path.basename(file_path)
-static_out = file_path.replace(".docx", "_Static_Information.png")
-plt.savefig(static_out, bbox_inches="tight", pad_inches=0.3, dpi = DPI)
-plt.close(fig_static)
+    file_path = os.path.basename(file_path)
+    static_out = file_path.replace(".docx", "_Static_Information.png")
+    plt.savefig(static_out, bbox_inches="tight", pad_inches=0.3, dpi = DPI)
+    plt.close(fig_static)
 
-print(f"Static Report Saved: {static_out}\n")
+    print(f"Static Report Saved: {static_out}\n")
+
+
+if __name__ == "__main__":
+    main()

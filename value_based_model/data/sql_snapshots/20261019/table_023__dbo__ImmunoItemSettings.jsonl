@@ -1,0 +1,8 @@
+{"Id":1,"Name":"Free T4","RefMin":0.89,"RefMax":1.79,"SortOrder":1,"NormalTextValue":null}
+{"Id":2,"Name":"PRL","RefMin":33.3,"RefMax":17.2,"SortOrder":2,"NormalTextValue":null}
+{"Id":3,"Name":"TSH.","RefMin":0.17,"RefMax":4.05,"SortOrder":3,"NormalTextValue":null}
+{"Id":4,"Name":"FT4","RefMin":0.93,"RefMax":1.7,"SortOrder":4,"NormalTextValue":null}
+{"Id":5,"Name":"CORT PM","RefMin":2.3,"RefMax":11.9,"SortOrder":5,"NormalTextValue":null}
+{"Id":6,"Name":"LACTATE","RefMin":0.5,"RefMax":2.2,"SortOrder":6,"NormalTextValue":null}
+{"Id":7,"Name":"Insulin","RefMin":1.21,"RefMax":14.5,"SortOrder":7,"NormalTextValue":null}
+{"Id":8,"Name":"C-peptide","RefMin":1.1,"RefMax":4.4,"SortOrder":8,"NormalTextValue":null}

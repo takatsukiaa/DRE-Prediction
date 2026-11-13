@@ -1,0 +1,43 @@
+{"Id":78,"AsmName":"Depakine","AsmDose":null,"AdverseResponse":"Depakine associated hepatitis","PatientBaselineViewModelPatientId":"0024"}
+{"Id":79,"AsmName":"topamax 100 mg","AsmDose":"0.5# bid -> 0.5#hs -> off (2025.6.17)","AdverseResponse":"cognitive slowness or dizziness topamax 100 mg 0.5# bid (電話告知可能有 cognitive slowness or dizziness, if SE+, consider to titrate down to 0.25 bid )-> 0.5#hs->off (2025.6.17)","PatientBaselineViewModelPatientId":"0025"}
+{"Id":80,"AsmName":"Fycompa","AsmDose":"2 mg/BID","AdverseResponse":"很暈(2024.03.21)","PatientBaselineViewModelPatientId":"0026"}
+{"Id":81,"AsmName":"Fycompa","AsmDose":"1mg","AdverseResponse":"吃一顆晚上會睡不著","PatientBaselineViewModelPatientId":"0041"}
+{"Id":82,"AsmName":"Vimpat","AsmDose":"0.5# bid to 1# bid","AdverseResponse":"暴躁脾氣大一點","PatientBaselineViewModelPatientId":"0042"}
+{"Id":83,"AsmName":"Dilantin","AsmDose":"3#hs to 2# hs (2022.12.13)","AdverseResponse":"毛髮增生,牙齦增生紅 taper Dilantin 3#hs to 2# hs (2022.12.13) 毛髮增生,牙齦增生紅, improved 2025.5.13->off 2026.1.22","PatientBaselineViewModelPatientId":"0054"}
+{"Id":84,"AsmName":"1.Lamictal 2.Fycompa 3.Vimpat","AsmDose":"1.3-2-1 (2025.9.4 for skin rash)-> 3-1-1 (2025.10.2 no skin rash) 2.1#HS 3.0.5 tab/HS","AdverseResponse":"1.skin rashes and unable to focus attention (obs skin rashes with taperred down Lamictal dose and sz. back to opd if skin rashes progress；unable to focus attention, with Lamictal, affect drive) 2.daytime drowsiness (Fycompa 1hs-> DC for daytime drowsiness) 3.Hair loss (Hair loss with VPA)","PatientBaselineViewModelPatientId":"0057"}
+{"Id":85,"AsmName":"1.Vimpat 100mg/tab (Lacosamide) 2.Fycompa 2mg/tab (Perampanel)","AsmDose":"1. 0.5 tab/BID 2. 1 tab/HS","AdverseResponse":"1. dizzy, sleepy 2. 頭暈","PatientBaselineViewModelPatientId":"0119"}
+{"Id":86,"AsmName":"1.Lamictal 5mg 2.Valproate 500mg","AsmDose":"1.1-1 to 4-4 2.0.5# bid","AdverseResponse":"1.skin itchy (Lamictal 5mg 1-1 to 4-4 by week-> off due to skin itchy) 2.sleepiness (sleepiness with VPA 0.5# bid)","PatientBaselineViewModelPatientId":"0131"}
+{"Id":87,"AsmName":"CarbamazepineCR更換成Carpin後反應變慢. => Change Carpin to Trileptal (300) 1pc BID.","AsmDose":null,"AdverseResponse":"反應變慢","PatientBaselineViewModelPatientId":"0139"}
+{"Id":88,"AsmName":"keppra","AsmDose":"+ keppra 0.5-1 bid (1-1會發脾氣Lev)","AdverseResponse":"發脾氣","PatientBaselineViewModelPatientId":"0143"}
+{"Id":89,"AsmName":"zonergran, topamax, Fycompa","AsmDose":null,"AdverseResponse":"DC: zonergran, topamax, Fycompa(feels initial zonergran induced nocturnal seizure but adap later; nausea with topamax, 2017.12.21 Fycompa 2mg hs : DC for nausea)","PatientBaselineViewModelPatientId":"0160"}
+{"Id":90,"AsmName":"Keppra","AsmDose":null,"AdverseResponse":"EDS after Keppra use","PatientBaselineViewModelPatientId":"0161"}
+{"Id":91,"AsmName":"trileptal","AsmDose":null,"AdverseResponse":"hypoNa hx (related to poor intake and/or trileptal)","PatientBaselineViewModelPatientId":"0183"}
+{"Id":92,"AsmName":"Fycompa","AsmDose":"1#Hs (2017.10)","AdverseResponse":"DC for increased sz frq(2012.12)","PatientBaselineViewModelPatientId":"0200"}
+{"Id":93,"AsmName":"Fycompa 2mg/tab (Perampanel)","AsmDose":"4 tab/HS 以下","AdverseResponse":"DC Fycompa , BECAUSE of involuntary rolling head movement, constipation+, pt not taking Fycompa 4#","PatientBaselineViewModelPatientId":"0203"}
+{"Id":94,"AsmName":"Carbamazepine","AsmDose":null,"AdverseResponse":"initial carbin with dizziness","PatientBaselineViewModelPatientId":"0206"}
+{"Id":95,"AsmName":"Topamax(Topiramate)","AsmDose":"25mg/cap","AdverseResponse":"拒吃因覺得脖子掐緊有關","PatientBaselineViewModelPatientId":"0208"}
+{"Id":96,"AsmName":"Keppra","AsmDose":"2 tab/BID","AdverseResponse":"mood","PatientBaselineViewModelPatientId":"0219"}
+{"Id":97,"AsmName":"Briva","AsmDose":"1 tab/BID","AdverseResponse":"change to Lev 1-1 for dizziness with Briva with difficult titration","PatientBaselineViewModelPatientId":"0227"}
+{"Id":98,"AsmName":"Lamictal, Levetiracetam","AsmDose":null,"AdverseResponse":"Lamictal 感覺視力弱; Lev. 暈 -> shift to trileptal 1# bid-> hyponatremia->0.5# bid Trileptal → hyponatremia → 0.5# bid → off ASM ~2025/7/22 by herself","PatientBaselineViewModelPatientId":"0029"}
+{"Id":99,"AsmName":"Briva","AsmDose":"1#BID","AdverseResponse":"暈","PatientBaselineViewModelPatientId":"0034"}
+{"Id":100,"AsmName":"Keppra, lamictal, Lacosamide","AsmDose":"keppra 0.5# bid lamictal (5) 1# bid-> 1-2 then (5) 2# bid (2017.12)-> 1-1 (0.5-1, then 1-1 2018.4)-> 1.5 (50) # bid then 2# bid (2018.8) Lacosamide 0.5# bid (2022.3.3)","AdverseResponse":"Sleepy (Keppra, lamictal, Lacosamide)","PatientBaselineViewModelPatientId":"0056"}
+{"Id":101,"AsmName":"VPA ( depakine )","AsmDose":"1# hs","AdverseResponse":"較淺眠 VPA 2#hs -> 1# hs 較淺眠-> 0.5# hs","PatientBaselineViewModelPatientId":"0022"}
+{"Id":102,"AsmName":"carbamazepine","AsmDose":"2 tab/BID (2017.8.8) 2 tab/QD, 2 tab/QN (2025.11.6)","AdverseResponse":"Ataxia and headache Ataxia and headache, related to carbamazepine toxicity, improved. (2017.8.8, 2025.11.6)","PatientBaselineViewModelPatientId":"0068"}
+{"Id":103,"AsmName":"2025/10/31 Trileptal","AsmDose":"300mg/tab 1-1.5-1.5","AdverseResponse":"耳鳴頻繁","PatientBaselineViewModelPatientId":"0075"}
+{"Id":104,"AsmName":"Lamictal","AsmDose":"10mg(20251113)->25mg(20251113)->10mg(20260113)","AdverseResponse":"expressive aphasia, alaxia with words and numbers, 記憶錯亂(時間記錯,或記不起來)","PatientBaselineViewModelPatientId":"0080"}
+{"Id":105,"AsmName":"U-free 500mg, Carpine","AsmDose":"2-2 BID, 2 tab/BID","AdverseResponse":"hot temper -> change to Keppra 2# bid (2022/8/11), 頭暈","PatientBaselineViewModelPatientId":"0084"}
+{"Id":106,"AsmName":"1. Frisium 2. Sabril","AsmDose":"1 tab/BID 2. 0.5 tab/BID","AdverseResponse":"1. mood and general condition improving, mother thinks frisium will affect her mood therefore taper it 2#-1# OQD 0.5-0.5 (2018.12) Mother thinks many side effect with sabril, psychosis and mood problem, memory and GI constipation-> off","PatientBaselineViewModelPatientId":"0103"}
+{"Id":107,"AsmName":"1. Carpine 2.Keppra 3.Vimpat 4.Rivotril 5.Trileptal","AsmDose":"1.2 tab/BID 2.1 tab/BID 3.1 tab/BID 4.1 tab/HS 5.2 tab/BID","AdverseResponse":"1. unsteadiness 2. 整個臉都麻麻的,暈眩,無法耐受 3.dizziness 4.too sleepy with rivotril 5.Trileptal 2-2 too dizziness, improved with 1-2.","PatientBaselineViewModelPatientId":"0104"}
+{"Id":108,"AsmName":"Briviact","AsmDose":"0.5# bid","AdverseResponse":"daytime sleepy with Briviact 0.5# bid, affecting work","PatientBaselineViewModelPatientId":"0122"}
+{"Id":109,"AsmName":"levetiracetam","AsmDose":"0.5#QD","AdverseResponse":"sleepy with levetiracetam 0.5#QD","PatientBaselineViewModelPatientId":"0141"}
+{"Id":110,"AsmName":"Keppra","AsmDose":"1 tab/BID","AdverseResponse":"Initially, very sleepy to Keppra.","PatientBaselineViewModelPatientId":"0155"}
+{"Id":111,"AsmName":"Lamictal 50mg/tab(Lamotrigine)","AsmDose":"2-2","AdverseResponse":"fatigue","PatientBaselineViewModelPatientId":"0195"}
+{"Id":112,"AsmName":"keppra","AsmDose":"0.5 tab/BID","AdverseResponse":"less sleepiness/ general mailase with sabril better than keppra","PatientBaselineViewModelPatientId":"0222"}
+{"Id":113,"AsmName":"Tegretol/Carpine 200mg/tab (Carbamazepine)","AsmDose":"2.5 tab/BID","AdverseResponse":"skin allergy","PatientBaselineViewModelPatientId":"0223"}
+{"Id":114,"AsmName":"Fycompa","AsmDose":"1#hs","AdverseResponse":"mild daytime sleepy","PatientBaselineViewModelPatientId":"0225"}
+{"Id":115,"AsmName":"Topamax 25mg/cap(Topiramate)","AsmDose":"1 cap/HS","AdverseResponse":"sleepiness","PatientBaselineViewModelPatientId":"0233"}
+{"Id":116,"AsmName":"keppra","AsmDose":"0.5 tab/BID","AdverseResponse":"dizziness","PatientBaselineViewModelPatientId":"0238"}
+{"Id":117,"AsmName":"1. Topamax 25mg/cap(Topiramate) 2. Carpine 200mg/tab (Carbamazepine)","AsmDose":"1.1 cap/HS 2.1 tab/BID","AdverseResponse":"1.Headache 2.tachycardia, dyspnea","PatientBaselineViewModelPatientId":"0243"}
+{"Id":118,"AsmName":"Keppra 500mg/tab(Levetiracetam)","AsmDose":"0.5 tab/BID","AdverseResponse":null,"PatientBaselineViewModelPatientId":"0254"}
+{"Id":119,"AsmName":"Tegretol CR (Carbamazepine)","AsmDose":"200mg/tab","AdverseResponse":"1.5-1then 1-1 related 嘴巴破皮? (2020.4)","PatientBaselineViewModelPatientId":"0007"}
+{"Id":121,"AsmName":"Depakine Chrono (Valproate)","AsmDose":"3000 mg/day（實際當日處方：2-1.5-2.5）","AdverseResponse":"hand tremor marked; risk of worsening tremor, hypoNa","PatientBaselineViewModelPatientId":"0145"}

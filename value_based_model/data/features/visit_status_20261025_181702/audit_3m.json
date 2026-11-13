@@ -1,0 +1,132 @@
+{
+  "patient_count": 265,
+  "patients_with_visits": 265,
+  "prediction_visits": 43581,
+  "feature_count": 784,
+  "all_missing_features": 210,
+  "as_of": "2026-10-19",
+  "history_months": 3,
+  "history_anchor_months": 12,
+  "status_history_included": false,
+  "prediction_timing": "strictly before medication visit",
+  "daily_dose_unit": "mg/day",
+  "dose_features_included": true,
+  "numeric_male_code": "1",
+  "clinical_visit_policy": "AsmRecords.IsWuVisit: 0 = visit with another physician; 1 = visit with Dr. Wu; - = no visit record. Missing/unrecognized markers are excluded. Compare consecutive distinct actual visit dates strictly inside the input window.",
+  "medication_comparisons_enabled": false,
+  "medication_comparison_evidence": [],
+  "coverage_fractions_in_predictors": true,
+  "seizure_coverage_fraction_diagnostics": {
+    "3m": {
+      "windows": 43581,
+      "complete": 308,
+      "zero": 22296,
+      "partial": 20977,
+      "mean_coverage_fraction": 0.36368745992217455
+    }
+  },
+  "dose_value_policy": "Preserve stored doses without clipping; largest source doses listed for review",
+  "source_issues": {
+    "AsmRecords: invalid/future date": 4,
+    "BioChemRecords: invalid/future date": 2,
+    "BioChemRecords: nonnumeric/censored result": 304,
+    "BioChemRecords: unrecognized measurement key": 8976,
+    "BrainImages: invalid/future date": 222,
+    "DrugLevelRecords: invalid/future date": 8,
+    "DrugLevelRecords: nonnumeric/censored result": 1,
+    "DrugLevelRecords: unrecognized measurement key": 3860,
+    "HematologyRecords: nonnumeric/censored result": 2,
+    "HematologyRecords: unrecognized measurement key": 253,
+    "ImmunoRecords: unrecognized measurement key": 554,
+    "measurements: conflicting same-date values": 1,
+    "medication: Activity supported by quantity; daily dose missing": 381,
+    "medication: Empty or uninterpretable ASM snapshot": 193,
+    "medication: Medication dose and quantity missing": 2,
+    "medication: Medication schedule missing": 151,
+    "medication: Multiple active details: dose needs reconciliation": 13799,
+    "medication: PRN/stat/not-taking entry excluded": 728,
+    "medication: Piracetam excluded; indication review": 20
+  },
+  "eeg_encoding": {
+    "encoded_segments": 4610,
+    "definite_normal_segments": 956,
+    "segments_with_assessable_findings": 3994,
+    "segments_needing_review": 888,
+    "review:conflicting_negation": 134,
+    "review:no_assessable_encoded_findings": 616,
+    "review:normal_heading_with_positive_findings": 240,
+    "review:probably_normal_not_definite_negative": 138,
+    "review:unclear_location": 174,
+    "review:embedded_report_split": 18,
+    "review:empty_or_non_eeg_text": 60
+  },
+  "limitations": [
+    "Recording timestamps unavailable; observation dates are used.",
+    "EEG findings use the existing rule encoder and require representative clinical review; imaging remains timing-only.",
+    "Lab recognition is conservative; unrecognized keys and censored values are excluded.",
+    "Multiple active medication details leave dose missing pending reconciliation.",
+    "No learned imputation, predictive feature selection, or model fitting has run."
+  ],
+  "largest_stored_daily_doses_for_review": [
+    {
+      "drug_detail_id": "99331",
+      "asm_record_id": "32159",
+      "substance": "Valproate",
+      "daily_mg": 240000.0
+    },
+    {
+      "drug_detail_id": "99339",
+      "asm_record_id": "32161",
+      "substance": "Valproate",
+      "daily_mg": 240000.0
+    },
+    {
+      "drug_detail_id": "99351",
+      "asm_record_id": "32164",
+      "substance": "Valproate",
+      "daily_mg": 240000.0
+    },
+    {
+      "drug_detail_id": "99359",
+      "asm_record_id": "32166",
+      "substance": "Valproate",
+      "daily_mg": 240000.0
+    },
+    {
+      "drug_detail_id": "99371",
+      "asm_record_id": "32169",
+      "substance": "Valproate",
+      "daily_mg": 240000.0
+    },
+    {
+      "drug_detail_id": "99383",
+      "asm_record_id": "32172",
+      "substance": "Valproate",
+      "daily_mg": 240000.0
+    },
+    {
+      "drug_detail_id": "99395",
+      "asm_record_id": "32175",
+      "substance": "Valproate",
+      "daily_mg": 240000.0
+    },
+    {
+      "drug_detail_id": "99407",
+      "asm_record_id": "32178",
+      "substance": "Valproate",
+      "daily_mg": 240000.0
+    },
+    {
+      "drug_detail_id": "99415",
+      "asm_record_id": "32180",
+      "substance": "Valproate",
+      "daily_mg": 240000.0
+    },
+    {
+      "drug_detail_id": "99427",
+      "asm_record_id": "32183",
+      "substance": "Valproate",
+      "daily_mg": 240000.0
+    }
+  ]
+}

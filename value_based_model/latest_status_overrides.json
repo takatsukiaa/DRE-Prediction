@@ -1,0 +1,10 @@
+{
+  "scope": "latest_recorded_visit",
+  "labels": [
+    {
+      "patient_id": "0258",
+      "status": "DRE",
+      "source": "User-confirmed latest-visit DRE status on October 24, 2026; restored from this task's recorded instructions."
+    }
+  ]
+}

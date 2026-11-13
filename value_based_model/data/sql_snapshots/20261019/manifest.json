@@ -1,0 +1,675 @@
+{
+  "format_version": 1,
+  "format": "jsonl",
+  "database": "EpilepsyDB",
+  "server": "DESKTOP-LFFUATB\\SQLEXPRESS",
+  "extracted_at_utc": "2026-10-19T10:56:16.357985+00:00",
+  "table_count": 32,
+  "total_rows": 220509,
+  "tables": [
+    {
+      "table": "dbo.__EFMigrationsHistory",
+      "schema": "dbo",
+      "name": "__EFMigrationsHistory",
+      "file": "table_001__dbo____EFMigrationsHistory.jsonl",
+      "rows": 35,
+      "columns": [
+        "MigrationId",
+        "ProductVersion"
+      ],
+      "sha256": "111a1cb8517638c05b3bb06ef275d7199e24cf77f5c713f229dc9e87855246f4"
+    },
+    {
+      "table": "dbo.AdverseReactionDetail",
+      "schema": "dbo",
+      "name": "AdverseReactionDetail",
+      "file": "table_002__dbo__AdverseReactionDetail.jsonl",
+      "rows": 43,
+      "columns": [
+        "Id",
+        "AsmName",
+        "AsmDose",
+        "AdverseResponse",
+        "PatientBaselineViewModelPatientId"
+      ],
+      "sha256": "aef4657b595ce63ba5a2a0d1afa8dfa180400f4ef34e71612606a01e236734ba"
+    },
+    {
+      "table": "dbo.AntigenRecords",
+      "schema": "dbo",
+      "name": "AntigenRecords",
+      "file": "table_003__dbo__AntigenRecords.jsonl",
+      "rows": 4,
+      "columns": [
+        "Id",
+        "Date",
+        "TestName",
+        "Result",
+        "Note",
+        "PatientBaselineViewModelPatientId"
+      ],
+      "sha256": "e18226324037480493643e7277b0653f772f55bd8c776451254491e5d7c1c968"
+    },
+    {
+      "table": "dbo.AsmDrugDetail",
+      "schema": "dbo",
+      "name": "AsmDrugDetail",
+      "file": "table_004__dbo__AsmDrugDetail.jsonl",
+      "rows": 95138,
+      "columns": [
+        "Id",
+        "DrugName",
+        "Quantity",
+        "Unit",
+        "MgPerUnit",
+        "DailyDose",
+        "WhoDddValue",
+        "AsmRecordViewModelId",
+        "Frequency"
+      ],
+      "sha256": "868ebb95a67b3097e3d6c26a5cc04a19bbda281f3c068a6822091c159912bd60"
+    },
+    {
+      "table": "dbo.AsmDrugSettings",
+      "schema": "dbo",
+      "name": "AsmDrugSettings",
+      "file": "table_005__dbo__AsmDrugSettings.jsonl",
+      "rows": 15,
+      "columns": [
+        "Id",
+        "ActiveSubstance",
+        "WhoDddValue",
+        "DrugLabel",
+        "MgPerUnit",
+        "DefaultUnit"
+      ],
+      "sha256": "965eb759130573a67c4a6b80420761a6818155318b1eae22ed562152a3fc7b1b"
+    },
+    {
+      "table": "dbo.AsmRecords",
+      "schema": "dbo",
+      "name": "AsmRecords",
+      "file": "table_006__dbo__AsmRecords.jsonl",
+      "rows": 43585,
+      "columns": [
+        "Id",
+        "Date",
+        "IsWuVisit",
+        "SoapReason",
+        "DxPlan",
+        "Note",
+        "PatientBaselineViewModelPatientId",
+        "SeizureNote"
+      ],
+      "sha256": "4e3c685dd18eb12603a285506448ac09e5c01034ce3ba0a42d1df27a4bae5fa4"
+    },
+    {
+      "table": "dbo.BioChemItemSettings",
+      "schema": "dbo",
+      "name": "BioChemItemSettings",
+      "file": "table_007__dbo__BioChemItemSettings.jsonl",
+      "rows": 56,
+      "columns": [
+        "Id",
+        "Name",
+        "SortOrder",
+        "RefMax",
+        "RefMin",
+        "NormalTextValue"
+      ],
+      "sha256": "0791f36212f48bd5d5ad68d42e80087ae2feb442118b83746b67e4d5370782ce"
+    },
+    {
+      "table": "dbo.BioChemRecords",
+      "schema": "dbo",
+      "name": "BioChemRecords",
+      "file": "table_008__dbo__BioChemRecords.jsonl",
+      "rows": 3143,
+      "columns": [
+        "Id",
+        "Date",
+        "DynamicDataJson",
+        "PatientBaselineViewModelPatientId"
+      ],
+      "sha256": "8c3037c81da5149d731e6a4879b4e7081ef0f99c424fd10cbc4cff1ed8075ac0"
+    },
+    {
+      "table": "dbo.BrainImages",
+      "schema": "dbo",
+      "name": "BrainImages",
+      "file": "table_009__dbo__BrainImages.jsonl",
+      "rows": 806,
+      "columns": [
+        "Id",
+        "ImageType",
+        "ExaminationDate",
+        "Note",
+        "PatientBaselineViewModelPatientId"
+      ],
+      "sha256": "4ff5cb32140a46de169764d2d983dea128e9cb4f12a65cafaa2d3e37876d216a"
+    },
+    {
+      "table": "dbo.BrainImageTypeSettings",
+      "schema": "dbo",
+      "name": "BrainImageTypeSettings",
+      "file": "table_010__dbo__BrainImageTypeSettings.jsonl",
+      "rows": 4,
+      "columns": [
+        "Id",
+        "TypeName"
+      ],
+      "sha256": "7d40441583fa884878c485ab69fcfd60485aa62c9be17ee59c5f41896bc0187a"
+    },
+    {
+      "table": "dbo.BrainRegionSettings",
+      "schema": "dbo",
+      "name": "BrainRegionSettings",
+      "file": "table_011__dbo__BrainRegionSettings.jsonl",
+      "rows": 5,
+      "columns": [
+        "Id",
+        "Name",
+        "SortOrder",
+        "PatientBaselineViewModelPatientId"
+      ],
+      "sha256": "168e4b6d4bcd8613495dc53db4317893b618a0f04a095ccf79a1a13db0c6a002"
+    },
+    {
+      "table": "dbo.CasiRecords",
+      "schema": "dbo",
+      "name": "CasiRecords",
+      "file": "table_012__dbo__CasiRecords.jsonl",
+      "rows": 430,
+      "columns": [
+        "Id",
+        "Date",
+        "Q1",
+        "Q1_MONTH",
+        "Q1_BPL",
+        "Q1_BYR",
+        "Q1_BADY",
+        "Q1_SUN",
+        "Q2",
+        "Q2_RC1a",
+        "Q2_RC1b",
+        "Q2_RC1c",
+        "Q2_RC2a",
+        "Q2_RC2b",
+        "Q2_RC2c",
+        "Q2_RCOJ",
+        "Q3",
+        "Q3_RGS1",
+        "Q3_RPTa",
+        "Q3_RPTb",
+        "Q4",
+        "Q4_DBa",
+        "Q4_DBb",
+        "Q4_DBc",
+        "Q4_SUBa",
+        "Q4_SUBb",
+        "Q4_SUBc",
+        "Q5",
+        "Q5_AGE",
+        "Q5_YR",
+        "Q5_MO",
+        "Q5_DATE",
+        "Q5_DAY",
+        "Q5_TIME",
+        "Q5_Spa",
+        "Q5_SPb",
+        "Q6",
+        "Q6_SIMa",
+        "Q6_SIMb",
+        "Q6_SIMc",
+        "Q6_JGTa",
+        "Q6_JGTb",
+        "Q6_JGTc",
+        "Q7",
+        "Q7_READa",
+        "Q7_WRITE",
+        "Q7_NAMING",
+        "Q7_BODY",
+        "Q7_OBJa",
+        "Q7_OBJb",
+        "Q7_CMD",
+        "Q8",
+        "Q8_DRAW",
+        "Q9",
+        "Q9_ANML",
+        "PatientBaselineViewModelPatientId",
+        "TotalScore"
+      ],
+      "sha256": "0775f3b0d5cb0e28f6a237715531189fe136e1a522a79e6214d233770dbe95b7"
+    },
+    {
+      "table": "dbo.ClinicalFeatureSettings",
+      "schema": "dbo",
+      "name": "ClinicalFeatureSettings",
+      "file": "table_013__dbo__ClinicalFeatureSettings.jsonl",
+      "rows": 7,
+      "columns": [
+        "Id",
+        "Name"
+      ],
+      "sha256": "48922c37363b24b70295a4326b9c39d1d8ebb09041c100a7133e4b7b6bc115ee"
+    },
+    {
+      "table": "dbo.DrugLevelItemSettings",
+      "schema": "dbo",
+      "name": "DrugLevelItemSettings",
+      "file": "table_014__dbo__DrugLevelItemSettings.jsonl",
+      "rows": 4,
+      "columns": [
+        "Id",
+        "Name",
+        "SortOrder",
+        "RefMax",
+        "RefMin",
+        "NormalTextValue"
+      ],
+      "sha256": "17a5766a36d25d83767c19ac8f7c9ad411d1d571527645cdbf55476aa62f1585"
+    },
+    {
+      "table": "dbo.DrugLevelRecords",
+      "schema": "dbo",
+      "name": "DrugLevelRecords",
+      "file": "table_015__dbo__DrugLevelRecords.jsonl",
+      "rows": 3986,
+      "columns": [
+        "Id",
+        "Date",
+        "DynamicDataJson",
+        "Note",
+        "PatientBaselineViewModelPatientId"
+      ],
+      "sha256": "428e47b83478b7f88a8515bcaa248e7cfe2f7bd8f766d36d472129c3e7a14eba"
+    },
+    {
+      "table": "dbo.EegElectrodeSettings",
+      "schema": "dbo",
+      "name": "EegElectrodeSettings",
+      "file": "table_016__dbo__EegElectrodeSettings.jsonl",
+      "rows": 30,
+      "columns": [
+        "Id",
+        "ElectrodeName",
+        "BrainRegionId"
+      ],
+      "sha256": "f1f4f8a58b785056f1eca83cef11fc5c7a3f964d7d57339723ef17c94e74b25c"
+    },
+    {
+      "table": "dbo.EegFocalityRecords",
+      "schema": "dbo",
+      "name": "EegFocalityRecords",
+      "file": "table_017__dbo__EegFocalityRecords.jsonl",
+      "rows": 160,
+      "columns": [
+        "Id",
+        "Date",
+        "Focality",
+        "PatientBaselineViewModelPatientId",
+        "Note"
+      ],
+      "sha256": "52a5fda08333f2b23c2b6634a5052e019661edab3129239a5746913ffce93862"
+    },
+    {
+      "table": "dbo.EegRecords",
+      "schema": "dbo",
+      "name": "EegRecords",
+      "file": "table_018__dbo__EegRecords.jsonl",
+      "rows": 4599,
+      "columns": [
+        "Id",
+        "Date",
+        "Note",
+        "PatientBaselineViewModelPatientId"
+      ],
+      "sha256": "10d61a1b5510a906627c26a75763fa521aee63e32a9fdd0f1f94f29c45b3fedb"
+    },
+    {
+      "table": "dbo.EtiologySettings",
+      "schema": "dbo",
+      "name": "EtiologySettings",
+      "file": "table_019__dbo__EtiologySettings.jsonl",
+      "rows": 14,
+      "columns": [
+        "Id",
+        "Name"
+      ],
+      "sha256": "92d073e9f013adaa28bfb97cf863f39484d6a53dae05159ff25fc8fb65dd5653"
+    },
+    {
+      "table": "dbo.HematologyItemSettings",
+      "schema": "dbo",
+      "name": "HematologyItemSettings",
+      "file": "table_020__dbo__HematologyItemSettings.jsonl",
+      "rows": 21,
+      "columns": [
+        "Id",
+        "Name",
+        "SortOrder",
+        "RefMax",
+        "RefMin",
+        "NormalTextValue"
+      ],
+      "sha256": "25a7d5c450bbec391dbacf548415b955f9ab58177d0523d51acd0cae7e357d81"
+    },
+    {
+      "table": "dbo.HematologyRecords",
+      "schema": "dbo",
+      "name": "HematologyRecords",
+      "file": "table_021__dbo__HematologyRecords.jsonl",
+      "rows": 1131,
+      "columns": [
+        "Id",
+        "Date",
+        "DynamicDataJson",
+        "PatientBaselineViewModelPatientId"
+      ],
+      "sha256": "25d9730e536df5a8f1b2c64c95fd98ced39a154bb96f5cc0bf76bf2237f61928"
+    },
+    {
+      "table": "dbo.HospitalizationRecords",
+      "schema": "dbo",
+      "name": "HospitalizationRecords",
+      "file": "table_022__dbo__HospitalizationRecords.jsonl",
+      "rows": 965,
+      "columns": [
+        "Id",
+        "Date",
+        "IsInpatient",
+        "IsEmergency",
+        "Note",
+        "PatientBaselineViewModelPatientId",
+        "EndDate"
+      ],
+      "sha256": "a8cdcacf4de4715c39661c5399bbde8bd09c5c71220b7a11d5a505c588862ca9"
+    },
+    {
+      "table": "dbo.ImmunoItemSettings",
+      "schema": "dbo",
+      "name": "ImmunoItemSettings",
+      "file": "table_023__dbo__ImmunoItemSettings.jsonl",
+      "rows": 8,
+      "columns": [
+        "Id",
+        "Name",
+        "RefMin",
+        "RefMax",
+        "SortOrder",
+        "NormalTextValue"
+      ],
+      "sha256": "69e72b5f084a5f092b9d90b3962b391f319586502ac76ed0282e9553f0d18198"
+    },
+    {
+      "table": "dbo.ImmunoRecords",
+      "schema": "dbo",
+      "name": "ImmunoRecords",
+      "file": "table_024__dbo__ImmunoRecords.jsonl",
+      "rows": 238,
+      "columns": [
+        "Id",
+        "Date",
+        "DynamicDataJson",
+        "Note",
+        "PatientBaselineViewModelPatientId"
+      ],
+      "sha256": "1325d4307b6f122ca8cb8b93a4368cb3a84b5abcf994d5dea905b80b7e09164d"
+    },
+    {
+      "table": "dbo.LabRecords",
+      "schema": "dbo",
+      "name": "LabRecords",
+      "file": "table_025__dbo__LabRecords.jsonl",
+      "rows": 0,
+      "columns": [
+        "Id",
+        "TestItem",
+        "Value",
+        "RefMin",
+        "RefMax",
+        "PatientBaselineViewModelPatientId"
+      ],
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "table": "dbo.MmseRecords",
+      "schema": "dbo",
+      "name": "MmseRecords",
+      "file": "table_026__dbo__MmseRecords.jsonl",
+      "rows": 431,
+      "columns": [
+        "Id",
+        "Date",
+        "TotalScore",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9",
+        "Q10",
+        "Q11",
+        "YR",
+        "Season",
+        "MO",
+        "MMSE_DATE",
+        "DAY",
+        "SPa",
+        "SPb",
+        "DPT",
+        "Floor",
+        "RC1a",
+        "RC1b",
+        "RC1c",
+        "DBd",
+        "SUB",
+        "RGS1",
+        "OBJa",
+        "RPTa",
+        "CMD",
+        "READa",
+        "WRITE",
+        "DRAW",
+        "PatientBaselineViewModelPatientId"
+      ],
+      "sha256": "0d205da5a89adbd145444b9a20c50911eab3bf42ecd9f544d09d74e5536db4a6"
+    },
+    {
+      "table": "dbo.MonthlyRecords",
+      "schema": "dbo",
+      "name": "MonthlyRecords",
+      "file": "table_027__dbo__MonthlyRecords.jsonl",
+      "rows": 0,
+      "columns": [
+        "Id",
+        "Year",
+        "Month",
+        "HasSeizure",
+        "HasEEGAbnormal",
+        "HasLab",
+        "VisitNote",
+        "PatientBaselineViewModelPatientId"
+      ],
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "table": "dbo.PatientMonthlyDreStatus",
+      "schema": "dbo",
+      "name": "PatientMonthlyDreStatus",
+      "file": "table_028__dbo__PatientMonthlyDreStatus.jsonl",
+      "rows": 42669,
+      "columns": [
+        "Id",
+        "PatientId",
+        "MonthStart",
+        "AssessmentDate",
+        "WindowStart",
+        "IsDRE",
+        "AsmCount",
+        "AsmRecordId",
+        "AsmRecordDate",
+        "AsmRecordAgeDays",
+        "SeizureCountLowerBound",
+        "SeizureCoverageComplete",
+        "Reason",
+        "EvidenceJson",
+        "SourceFingerprint",
+        "CalculationAsOf",
+        "MethodVersion",
+        "ContentHash",
+        "CalculatedAtUtc"
+      ],
+      "sha256": "98527670b29c439706708e24e2c6ae39a5146b3cd5376e856b7f8342712a3e1e"
+    },
+    {
+      "table": "dbo.Patients",
+      "schema": "dbo",
+      "name": "Patients",
+      "file": "table_029__dbo__Patients.jsonl",
+      "rows": 265,
+      "columns": [
+        "PatientId",
+        "Gender",
+        "Birthday",
+        "FirstSeizureAge",
+        "FirstSeizureNote",
+        "AgeFirstNckuVisit",
+        "AgeFirstNckuVisitNote",
+        "AgeFirstWuVisit",
+        "AgeFirstWuVisitNote",
+        "Age2026",
+        "EpilepsyDiagnosedByWu",
+        "LastSeizure",
+        "Occupation",
+        "IsDRE",
+        "DrugRefractoryDetail",
+        "SystemicDisease",
+        "NonAsmMedication",
+        "DX",
+        "HasOutsideFilm",
+        "HasOutsideFilmNote",
+        "HasRecordsBefore2000",
+        "HasPaperChart",
+        "HasAsmAdverse",
+        "EEGFocality",
+        "EegFocalityNote",
+        "Etiologies",
+        "EtiologyNote",
+        "MentalRetardationItems",
+        "MentalRetardation",
+        "HasMentalRetardation",
+        "MentalRetardationNote",
+        "SemiologyDx",
+        "SemiologyDetails",
+        "SemiologyFrequency",
+        "ProvokingFactor",
+        "AsymptomaticIed",
+        "SemiologyDescriptor",
+        "SeizureTypes",
+        "ClinicalFeatures",
+        "ClinicalFeaturesNote",
+        "SemiologyNote",
+        "IsStableCallReminder",
+        "DxPlan",
+        "Note",
+        "SeizureNote",
+        "SoapReason",
+        "SemiologyFrequencies",
+        "DreStatusDetail",
+        "HasPaperChartNote",
+        "LastUpdatedAt",
+        "LastCallReminderContactedAt",
+        "LastCallReminderVisitDate",
+        "LastCognitiveReminderCompletedAt",
+        "LastCognitiveReminderRecordDate",
+        "LastEegReminderCompletedAt",
+        "LastEegReminderRecordDate",
+        "LastLabReminderCompletedAt",
+        "LastLabReminderRecordDate",
+        "MedicalRecordNumber"
+      ],
+      "sha256": "c1405c041ae0b7816766abc8acf9463f6312bed6e001a77d2d2385433c12e107"
+    },
+    {
+      "table": "dbo.PregnancyRecords",
+      "schema": "dbo",
+      "name": "PregnancyRecords",
+      "file": "table_030__dbo__PregnancyRecords.jsonl",
+      "rows": 116,
+      "columns": [
+        "Id",
+        "RecordDate",
+        "IsCurrentlyPregnant",
+        "HasObsAbnormality",
+        "PregnancyNumber",
+        "ChildbirthNumber",
+        "InbornErrorOfChild",
+        "DevelopmentalDelay",
+        "SpontaneousAbortion",
+        "ArtificialAbortion",
+        "SeizureFreqT1",
+        "SeizureFreqT2",
+        "SeizureFreqT3",
+        "FrequencyChange",
+        "PatientBaselineViewModelPatientId"
+      ],
+      "sha256": "4cb3a4d0c9c265474b8e029037d674fbb230c36a88908264259ad5d2196c10f3"
+    },
+    {
+      "table": "dbo.SeizureEventViewModel",
+      "schema": "dbo",
+      "name": "SeizureEventViewModel",
+      "file": "table_031__dbo__SeizureEventViewModel.jsonl",
+      "rows": 22600,
+      "columns": [
+        "Id",
+        "DateString",
+        "SeizureCount",
+        "TimeOfDay",
+        "Description",
+        "HasVideo",
+        "AsmRecordViewModelId",
+        "PatientBaselineViewModelPatientId",
+        "RecordType",
+        "EndDateString"
+      ],
+      "sha256": "86cd7be783ae712086c4704625ae43f8f3315ed3d5e2fb4841bc6bb2e18b3bfa"
+    },
+    {
+      "table": "dbo.WaisRecords",
+      "schema": "dbo",
+      "name": "WaisRecords",
+      "file": "table_032__dbo__WaisRecords.jsonl",
+      "rows": 1,
+      "columns": [
+        "Id",
+        "Date",
+        "Q1",
+        "Q2",
+        "Q3",
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q8",
+        "Q9",
+        "Q10",
+        "Q11",
+        "Q12",
+        "Q13",
+        "Q14",
+        "PatientBaselineViewModelPatientId",
+        "TotalScore"
+      ],
+      "sha256": "0d0260fd21a4b343decb2c1014a7ff75cb9bdbcfddb2ef5116c88fb7abfebb64"
+    }
+  ],
+  "metadata_hashes": {
+    "schema.json": "289ddd96948db73cec30a0becd8a2ac3e48ee546e5be11b3eb0963217001b761",
+    "inventory.json": "14abe8db27f8c6476dcc4f158acf7101e3eca36f3faf1d5017032a866b736711"
+  }
+}
